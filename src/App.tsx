@@ -5,8 +5,8 @@ import ErrorBoundary from '@components/ErrorBoundary'
 import Exception from '@components/Exception'
 import Sider from '@components/Sider'
 import Loading from '@components/Loading'
-import Table from '@pages/Table'
-import Home from '@pages/Home'
+
+import HomePage from '@pages/HomePage'
 import { routes, RouteProps } from '@lib/routes'
 
 function App() {
@@ -48,7 +48,7 @@ function App() {
           <Layout.Content>
             <Suspense fallback={<Loading />}>
               <Switch>
-                <Route exact path="/" component={Home} />
+                <Route exact path="/" component={HomePage} />
                 {_routes}
                 <Route component={Exception} />
               </Switch>
