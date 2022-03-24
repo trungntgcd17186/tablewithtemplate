@@ -1,0 +1,54 @@
+.ant-table-content {
+  overflow-y: scroll;
+}
+
+.ant-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ant-col {
+  margin-top: 20px;
+  margin-left: 7px;
+}
+
+.ant-btn {
+  margin-left: 10px;
+}
+
+.ant-table-column-sorter {
+  margin-bottom: 30px;
+}
+
+.title-created {
+  width: 100px;
+  text-align: center;
+  height: 54px;
+}
+
+.ant-table-filter-dropdown {
+  margin-top: -40px;
+  margin-right: 55px;
+}
+
+/* .ant-table-filter-dropdown > Input {
+} */
+
+.status {
+  width: 80px;
+  background-color: #eaf7fa;
+  color: #008dff;
+  text-align: center;
+  border: 1px solid #008dff;
+  border-radius: 3px;
+  font-weight: 500;
+}
+
+.ant-pagination-item-active {
+  border: 1px solid orange;
+}
+
+.ant-pagination-item-active a {
+  color: #333;
+}

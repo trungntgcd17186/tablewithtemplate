@@ -5,13 +5,7 @@ import { FilterValue, SorterResult } from 'antd/lib/table/interface'
 import Layout from '@components/Layout'
 import useModal from '@hooks/useModal'
 import IconEdit from '@icons/Edit'
-import {
-  useUsers,
-  useQueryUser,
-  useCreateUser,
-  useUpdateUser,
-  User,
-} from './queries'
+import { useUsers, useQueryUser, User } from './queries'
 import UserModal from './UserModal'
 
 export default function Home() {
@@ -40,14 +34,6 @@ export default function Home() {
       refetch()
       editModal.close()
     },
-  }
-
-  const [creating, handleAdd] = useCreateUser(mutationOpts)
-  const [updating, handleUpdate] = useUpdateUser(mutationOpts)
-
-  const handleOk = (values: Partial<User>) => {
-    const handler = values.id ? handleUpdate : handleAdd
-    handler(values)
   }
 
   const handleSearch = (value: string) => {
@@ -128,8 +114,6 @@ export default function Home() {
           item={user.data}
           loadingData={user.isFetching}
           onCancel={editModal.close}
-          confirmLoading={creating || updating}
-          onOk={handleOk}
         />
       )}
       <Layout path={[{ name: '列表范例' }]}>

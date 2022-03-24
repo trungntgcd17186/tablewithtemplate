@@ -1,9 +1,8 @@
 import React from 'react'
-import { useMutation } from 'react-query'
+
 import { UseQueryOptions } from '@lib/types'
-import { request } from '@utils/request'
+
 import useQuery from '@lib/useQuery'
-import type { MutationResult, MutationOptions } from '@lib/types'
 
 export type User = {
   id: number
@@ -64,34 +63,4 @@ export const useQueryUser = ({
     data,
     refetch,
   }
-}
-
-export const useCreateUser = (options: MutationOptions = {}) => {
-  const { mutate, isLoading } = useMutation(
-    (data: Partial<User>) =>
-      request('https://jsonplaceholder.typicode.com/users', {
-        method: 'POST',
-        body: data,
-      }),
-    {
-      ...options,
-    }
-  )
-
-  return [isLoading, mutate] as MutationResult
-}
-
-export const useUpdateUser = (options: MutationOptions = {}) => {
-  const { mutate, isLoading } = useMutation(
-    (data: Partial<User>) =>
-      request('https://jsonplaceholder.typicode.com/users/{id}', {
-        method: 'PATCH',
-        body: data,
-      }),
-    {
-      ...options,
-    }
-  )
-
-  return [isLoading, mutate] as MutationResult
 }
