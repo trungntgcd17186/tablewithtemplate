@@ -37,7 +37,7 @@ export let routes = [
     key: uuid(),
     title: 'Home',
     Icon: UserOutlined,
-    url: '/',
+    url: '/Home',
     exact: true,
     Component: Home,
   },

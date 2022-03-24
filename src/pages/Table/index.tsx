@@ -1,4 +1,5 @@
 import { DeleteFilled } from '@ant-design/icons'
+import Layout from '@components/Layout'
 import {
   Button,
   Col,
@@ -10,13 +11,12 @@ import {
   Table,
 } from 'antd'
 import 'antd/dist/antd.css'
-
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import fetchData, { deleteData, editData } from '../../api/index'
 import './index.css'
 
 export default function TableContent() {
-  const [datas, setDatas] = useState<any[]>([])
+  const [datas, setDatas] = useState<IDataType[]>([])
   const [obj, setObj] = useState<IFilter>({
     _page: 1,
   })
@@ -34,100 +34,49 @@ export default function TableContent() {
     fetchMyAPI()
   }, [obj, reRender])
 
-  const selectionType = 'checkbox'
+  const title = (labelHeader: string) => {
+    return (
+      <div
+        style={{
+          textAlign: 'center',
+          height: '54px',
+          display: 'flex',
+          flexDirection: 'column',
+        }}>
+        {labelHeader}
+        {labelHeader === quoteId || labelHeader === careRecipientName ? (
+          <Input style={{ width: 'auto' }} onChange={e => handleSearch(e)} />
+        ) : '' && labelHeader === dOB ? (
+          <DatePicker onChange={handleChangeCareRecipientDOB} />
+        ) : (
+          ''
+        )}
+      </div>
+    )
+  }
+  //Cái này không dùng tới, xóa thì lỗi rowSelection
 
-  const SelectRef = useRef<HTMLDivElement>(null)
-
+  const quoteId = 'Quote ID'
+  const careRecipientName = 'Care Recipient Name'
+  const rate = 'Hour Rate'
+  const dOB = 'Care Recipient DOB'
+  const titleShortTerm = 'Short Term'
   const columns = [
     {
-      title: () => {
-        return (
-          <div style={{ textAlign: 'center', height: '54px' }}>
-            Quote ID
-            <Input onChange={e => handleSearch(e)} />
-          </div>
-        )
-      },
+      title: title(quoteId),
       dataIndex: 'key',
-      key: 'key',
-      render(text: string) {
-        return {
-          props: {
-            style: { color: '#008DFF' },
-          },
-          children: <span>{text}</span>,
-        }
-      },
     },
     {
-      title: () => {
-        return (
-          <div
-            style={{
-              width: '150px',
-              textAlign: 'center',
-              height: '54px',
-            }}>
-            Care Recipient Name
-            <Input onChange={e => handleSearch(e)} />
-          </div>
-        )
-      },
+      title: title(careRecipientName),
       dataIndex: 'care_recipient_name',
-      key: 'care_recipient_name',
-
-      //Cái này không dùng tới, xóa thì lỗi rowSelection :))
-      onFilter: (value: any, record: any) => {
-        return record.care_recipient_name
-      },
     },
     {
-      title: () => {
-        return (
-          <div
-            style={{
-              width: '150px',
-              textAlign: 'center',
-            }}>
-            Care Recipient DOB
-            <DatePicker onChange={handleChangeCareRecipientDOB} />
-          </div>
-        )
-      },
+      title: title(dOB),
       dataIndex: 'care_recipient_dob',
-      key: 'care_recipient_dob',
-      render(text: IDataType) {
-        return {
-          props: {
-            style: { textAlign: 'right' },
-          },
-          children: <span>{text}</span>,
-        }
-      },
     },
     {
-      title: () => {
-        return (
-          <div
-            style={{
-              width: '80px',
-              textAlign: 'center',
-              height: '54px',
-            }}>
-            Hour Rate
-          </div>
-        )
-      },
+      title: title(rate),
       dataIndex: 'rate',
-      key: 'rate',
-      render(text: number) {
-        return {
-          props: {
-            style: { textAlign: 'right' },
-          },
-          children: <span>{text}</span>,
-        }
-      },
     },
     {
       title: () => {
@@ -138,8 +87,7 @@ export default function TableContent() {
               flexDirection: 'column',
               width: '80px',
               textAlign: 'center',
-            }}
-            ref={SelectRef}>
+            }}>
             Short Term
             <Select defaultValue="clear" onChange={handleChangeShortTerm}>
               <Option value="yes">YES</Option>
@@ -150,7 +98,7 @@ export default function TableContent() {
         )
       },
       dataIndex: 'short_temp',
-      key: 'short_temp',
+
       render(text: boolean) {
         return {
           props: {
@@ -183,7 +131,7 @@ export default function TableContent() {
         )
       },
       dataIndex: 'contagion',
-      key: 'contagion',
+
       render(text: boolean) {
         return {
           props: {
@@ -216,7 +164,7 @@ export default function TableContent() {
         )
       },
       dataIndex: 'emergency',
-      key: 'emergency',
+
       render(text: boolean) {
         return {
           props: {
@@ -251,7 +199,7 @@ export default function TableContent() {
         )
       },
       dataIndex: 'mileage_surcharge',
-      key: 'mileage_surcharge',
+
       render(text: boolean) {
         return {
           props: {
@@ -284,7 +232,7 @@ export default function TableContent() {
         )
       },
       dataIndex: 'primary_quote',
-      key: 'primary_quote',
+
       render(text: boolean) {
         return {
           props: {
@@ -311,15 +259,6 @@ export default function TableContent() {
         )
       },
       dataIndex: 'start_date',
-      key: 'start_date',
-      render(text: IDataType) {
-        return {
-          props: {
-            style: { textAlign: 'right' },
-          },
-          children: <span>{text}</span>,
-        }
-      },
     },
     {
       title: () => {
@@ -347,7 +286,7 @@ export default function TableContent() {
         return <div className="title-created">Created By</div>
       },
       dataIndex: 'created_by',
-      key: 'created_by',
+
       sorter: (a: IDataType, b: IDataType) => {
         return a.created_by.length - b.created_by.length
       },
@@ -390,7 +329,7 @@ export default function TableContent() {
         )
       },
       dataIndex: 'status',
-      key: 'status',
+
       render(text: string) {
         return {
           props: {
@@ -526,15 +465,19 @@ export default function TableContent() {
     setValueOption(value)
   }
 
-  const rowSelection = {
-    onChange: (selectedRowKeys: React.Key[], selectedRows: React.Key[]) => {
-      //Map field id từ selectedRows sau đó push id vào mảng array, set mảng vào state để cung cấp array id cho action.
-      const array: number[] = []
-      selectedRows.map((el: any) => array.push(el.id))
-      setArrIds(array)
-    },
+  const onSelectChange = (
+    record: IDataType,
+    selected: boolean,
+    selectedRows: IDataType[]
+  ) => {
+    const array: number[] = []
+    selectedRows.map((el: { id: number }) => array.push(el.id))
+    setArrIds(array)
   }
 
+  const rowSelection = {
+    onSelect: onSelectChange,
+  }
   //Xử lý action change data theo checkbox và checkbox all
   const handleCheckboxChangeData = async () => {
     if (valueOption === 'delete') {
@@ -586,32 +529,38 @@ export default function TableContent() {
 
   return (
     <div>
-      <Row>
-        <Col span="8">
-          {' '}
-          <Select
-            defaultValue="Change Status"
-            style={{ width: '68%', textAlign: 'left' }}
-            onChange={handleChange}>
-            <Option value="delete">Delete</Option>
-            <Option value="new">new</Option>
-            <Option value="approved">approved</Option>
-            <Option value="rejected">rejected</Option>
-            <Option value="closed">closed</Option>
-          </Select>
-          <Button onClick={handleCheckboxChangeData}>Apply</Button>
-        </Col>
-      </Row>
-      <Table
-        rowSelection={{
-          type: selectionType,
-          ...rowSelection,
-        }}
-        dataSource={datas}
-        columns={columns}
-        pagination={false}
-      />
-      <Pagination onChange={handleChangePage} total={100} />
+      <Layout>
+        <Row>
+          <Col span="8">
+            {' '}
+            <Select
+              defaultValue="Change Status"
+              style={{ width: '68%', textAlign: 'left' }}
+              onChange={handleChange}>
+              <Option value="delete">Delete</Option>
+              <Option value="new">new</Option>
+              <Option value="approved">approved</Option>
+              <Option value="rejected">rejected</Option>
+              <Option value="closed">closed</Option>
+            </Select>
+            <Button onClick={handleCheckboxChangeData}>Apply</Button>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <Table
+              rowSelection={{
+                type: 'checkbox',
+                ...rowSelection,
+              }}
+              dataSource={datas}
+              columns={columns}
+              pagination={false}
+            />
+            <Pagination onChange={handleChangePage} total={100} />
+          </Col>
+        </Row>
+      </Layout>
     </div>
   )
 }

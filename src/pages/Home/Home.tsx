@@ -14,7 +14,7 @@ export default function Home() {
     _limit: 10,
   })
 
-  const { data, isFetching, refetch } = useUsers({
+  const { data, isFetching } = useUsers({
     variables: query,
   })
 
@@ -28,13 +28,6 @@ export default function Home() {
   })
 
   const user = useQueryUser()
-
-  const mutationOpts = {
-    onSuccess: () => {
-      refetch()
-      editModal.close()
-    },
-  }
 
   const handleSearch = (value: string) => {
     setQuery(prev => ({ ...prev, q: value }))
