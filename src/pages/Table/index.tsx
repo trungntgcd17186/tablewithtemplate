@@ -17,7 +17,9 @@ import './index.css'
 
 export default function TableContent() {
   const [datas, setDatas] = useState<any[]>([])
-  const [obj, setObj] = useState<object>({ _page: 1 })
+  const [obj, setObj] = useState<IFilter>({
+    _page: 1,
+  })
   const [reRender, setReRender] = useState<boolean>(false)
 
   const [valueOption, setValueOption] = useState<string>('')
