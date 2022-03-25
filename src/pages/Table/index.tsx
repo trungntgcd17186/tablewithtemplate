@@ -21,10 +21,9 @@ export default function TableContent() {
     _page: 1,
   })
   const [reRender, setReRender] = useState<boolean>(false)
-
   const [valueOption, setValueOption] = useState<string>('')
-
   const [arrIds, setArrIds] = useState<React.Key[]>([])
+
   //Call lại Api sau khi obj thay đổi.
   useEffect(() => {
     async function fetchMyAPI() {
@@ -206,16 +205,11 @@ export default function TableContent() {
       title: selectOptions('Status', 'status'),
       dataIndex: 'status',
       render(text: string) {
-        return {
-          props: {
-            style: { textAlign: 'center' },
-          },
-          children: (
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <div className="status">{text}</div>
-            </div>
-          ),
-        }
+        return (
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <div className="status">{text}</div>
+          </div>
+        )
       },
     },
     {
@@ -261,7 +255,7 @@ export default function TableContent() {
     })
   }
 
-  //Xử lý search theo cột QuoteID
+  //Xử lý change page
   const handleChangePage = async (page: number) => {
     setObj({
       ...obj,
@@ -269,7 +263,7 @@ export default function TableContent() {
     })
   }
 
-  //Xử lý search theo cột Care Recipient Name
+  //Xử lý search theo cột Care Recipient Name, Quote ID
   const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setObj({
       ...obj,
