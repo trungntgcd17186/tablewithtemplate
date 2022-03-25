@@ -14,9 +14,32 @@
   margin-bottom: 10px;
 }
 
-/* .ant-table-cell {
+.ant-table-cell {
   text-align: right;
-} */
+}
+
+.select-option {
+  display: flex;
+  flex-direction: column;
+  width: 120px;
+  text-align: center;
+}
+
+.title-rate {
+  height: 54px;
+  width: 80px;
+  text-align: center;
+}
+
+.title-input-search {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.dob {
+  width: 150px;
+}
 
 .ant-table-wrapper {
   margin-left: 20px;

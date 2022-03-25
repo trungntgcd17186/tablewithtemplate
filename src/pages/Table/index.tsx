@@ -34,230 +34,128 @@ export default function TableContent() {
     fetchMyAPI()
   }, [obj, reRender])
 
-  const title = (labelHeader: string) => {
+  const { Option } = Select
+  function handleChange(value: string) {
+    setValueOption(value)
+  }
+
+  const title = (labelHeader: string, key: string) => {
     return (
-      <div
-        style={{
-          textAlign: 'center',
-          height: '54px',
-          display: 'flex',
-          flexDirection: 'column',
-        }}>
+      <>
         {labelHeader}
         {labelHeader === quoteId || labelHeader === careRecipientName ? (
-          <Input style={{ width: 'auto' }} onChange={e => handleSearch(e)} />
-        ) : '' && labelHeader === dOB ? (
-          <DatePicker onChange={handleChangeCareRecipientDOB} />
+          <div className="title-input-search">
+            <Input style={{ width: 'auto' }} onChange={e => handleSearch(e)} />
+          </div>
         ) : (
-          ''
+          <div className="title-input-search dob">
+            <DatePicker
+              onChange={(date: moment.Moment | null, dateString: string) =>
+                handleChangeDate(date, dateString, key)
+              }
+            />
+          </div>
+        )}
+      </>
+    )
+  }
+
+  const selectOptions = (labelHeader: string, key: string) => {
+    return (
+      <div className="select-option">
+        {labelHeader}
+        {labelHeader == 'Status' ? (
+          <Select
+            defaultValue="clear"
+            onChange={e => handleChangeOptions(e, key)}>
+            <Option value="new">new</Option>
+            <Option value="approved">approved</Option>
+            <Option value="rejected">rejected</Option>
+            <Option value="closed">closed</Option>
+            <Option value="clear">--</Option>
+          </Select>
+        ) : (
+          <Select
+            defaultValue="clear"
+            onChange={e => handleChangeOptions(e, key)}>
+            <Option value="true">YES</Option>
+            <Option value="false">NO</Option>
+            <Option value="clear">--</Option>
+          </Select>
         )}
       </div>
     )
   }
-  //Cái này không dùng tới, xóa thì lỗi rowSelection
+
+  const OptionValue = (value: boolean) => {
+    return (
+      <div style={{ textAlign: 'center' }}>
+        {value === true ? (
+          <span style={{ color: '#008DFF' }}>YES</span>
+        ) : (
+          <span style={{ color: '#FF0000' }}>NO</span>
+        )}
+      </div>
+    )
+  }
+
+  //Xử lý thay đổi select cột short term
+  const handleChangeOptions = async (e: boolean | string, key: string) => {
+    if (e == 'clear') {
+      setObj({ ...obj, [key]: undefined })
+    } else {
+      setObj({ ...obj, [key]: e })
+    }
+  }
 
   const quoteId = 'Quote ID'
   const careRecipientName = 'Care Recipient Name'
-  const rate = 'Hour Rate'
-  const dOB = 'Care Recipient DOB'
-  const titleShortTerm = 'Short Term'
   const columns = [
     {
-      title: title(quoteId),
+      title: title(quoteId, ''),
       dataIndex: 'key',
     },
     {
-      title: title(careRecipientName),
+      title: title(careRecipientName, ''),
       dataIndex: 'care_recipient_name',
     },
     {
-      title: title(dOB),
+      title: title('Care Recipient DOB', 'care_recipient_dob'),
       dataIndex: 'care_recipient_dob',
     },
     {
-      title: title(rate),
+      title: () => {
+        return <div className="title-rate">Hour Rate</div>
+      },
       dataIndex: 'rate',
     },
     {
-      title: () => {
-        return (
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              width: '80px',
-              textAlign: 'center',
-            }}>
-            Short Term
-            <Select defaultValue="clear" onChange={handleChangeShortTerm}>
-              <Option value="yes">YES</Option>
-              <Option value="no">NO</Option>
-              <Option value="clear">--</Option>
-            </Select>
-          </div>
-        )
-      },
+      title: selectOptions('Short Term', 'short_temp'),
       dataIndex: 'short_temp',
-
-      render(text: boolean) {
-        return {
-          props: {
-            style: {
-              color: text === true ? '#008DFF' : 'red',
-              textAlign: 'center',
-            },
-          },
-          children: <span>{text === true ? 'YES' : 'NO'}</span>,
-        }
-      },
+      render: OptionValue,
     },
     {
-      title: () => {
-        return (
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              width: '80px',
-              textAlign: 'center',
-            }}>
-            Contagion
-            <Select defaultValue="clear" onChange={handleChangeContagion}>
-              <Option value="yes">YES</Option>
-              <Option value="no">NO</Option>
-              <Option value="clear">--</Option>
-            </Select>
-          </div>
-        )
-      },
+      title: selectOptions('Contagion', 'contagion'),
       dataIndex: 'contagion',
-
-      render(text: boolean) {
-        return {
-          props: {
-            style: {
-              color: text === true ? '#008DFF' : 'red',
-              textAlign: 'center',
-            },
-          },
-          children: <span>{text === true ? 'YES' : 'NO'}</span>,
-        }
-      },
+      render: OptionValue,
     },
     {
-      title: () => {
-        return (
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              width: '80px',
-              textAlign: 'center',
-            }}>
-            Emergency
-            <Select defaultValue="clear" onChange={handleChangeEmergency}>
-              <Option value="yes">YES</Option>
-              <Option value="no">NO</Option>
-              <Option value="clear">--</Option>
-            </Select>
-          </div>
-        )
-      },
+      title: selectOptions('Emergency', 'emergency'),
       dataIndex: 'emergency',
-
-      render(text: boolean) {
-        return {
-          props: {
-            style: {
-              color: text === true ? '#008DFF' : 'red',
-              textAlign: 'center',
-            },
-          },
-          children: <span>{text === true ? 'YES' : 'NO'}</span>,
-        }
-      },
+      render: OptionValue,
     },
     {
-      title: () => {
-        return (
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              width: '130px',
-              textAlign: 'center',
-            }}>
-            Mileage Surcharge
-            <Select
-              defaultValue="clear"
-              onChange={handleChangeMileageSurcharge}>
-              <Option value="yes">YES</Option>
-              <Option value="no">NO</Option>
-              <Option value="clear">--</Option>
-            </Select>
-          </div>
-        )
-      },
+      title: selectOptions('Mileage Surcharge', 'mileage_surcharge'),
       dataIndex: 'mileage_surcharge',
-
-      render(text: boolean) {
-        return {
-          props: {
-            style: {
-              color: text === true ? '#008DFF' : 'red',
-              textAlign: 'center',
-            },
-          },
-          children: <span>{text === true ? 'YES' : 'NO'}</span>,
-        }
-      },
+      render: OptionValue,
     },
     {
-      title: () => {
-        return (
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              width: '105px',
-              textAlign: 'center',
-            }}>
-            Primary Quote
-            <Select defaultValue="clear" onChange={handleChangePrimaryQuote}>
-              <Option value="yes">YES</Option>
-              <Option value="no">NO</Option>
-              <Option value="clear">--</Option>
-            </Select>
-          </div>
-        )
-      },
+      title: selectOptions('Primary Quote', 'primary_quote'),
       dataIndex: 'primary_quote',
-
-      render(text: boolean) {
-        return {
-          props: {
-            style: {
-              color: text === true ? '#008DFF' : 'red',
-              textAlign: 'center',
-            },
-          },
-          children: <span>{text === true ? 'YES' : 'NO'}</span>,
-        }
-      },
+      render: OptionValue,
     },
     {
-      title: () => {
-        return (
-          <div
-            style={{
-              width: '150px',
-              textAlign: 'center',
-            }}>
-            Start Date
-            <DatePicker onChange={handleChangeStartDate} />
-          </div>
-        )
-      },
+      title: title('Start Date', 'start_date'),
       dataIndex: 'start_date',
     },
     {
@@ -305,37 +203,18 @@ export default function TableContent() {
       },
     },
     {
-      title: () => {
-        return (
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              width: '105px',
-              textAlign: 'center',
-            }}>
-            Status
-            <Select
-              defaultValue="clear"
-              showSearch
-              onChange={handleChangeStatus}>
-              <Option value="new">new</Option>
-              <Option value="approved">approved</Option>
-              <Option value="rejected">rejected</Option>
-              <Option value="closed">closed</Option>
-              <Option value="clear">--</Option>
-            </Select>
-          </div>
-        )
-      },
+      title: selectOptions('Status', 'status'),
       dataIndex: 'status',
-
       render(text: string) {
         return {
           props: {
             style: { textAlign: 'center' },
           },
-          children: <div className="status">{text}</div>,
+          children: (
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <div className="status">{text}</div>
+            </div>
+          ),
         }
       },
     },
@@ -344,126 +223,6 @@ export default function TableContent() {
       render: () => <DeleteFilled style={{ color: 'orange' }} />,
     },
   ]
-
-  //Xử lý thay đổi select cột short term
-  const handleChangeShortTerm = async (e: string) => {
-    if (e === 'yes') {
-      setObj({
-        ...obj,
-        short_temp: true,
-      })
-    } else if (e === 'no') {
-      setObj({
-        ...obj,
-        short_temp: false,
-      })
-    } else if (e === 'clear') {
-      setObj({
-        ...obj,
-        short_temp: undefined,
-      })
-    }
-  }
-
-  //Xử lý thay đổi select cột Contagion
-  const handleChangeContagion = async (e: string) => {
-    if (e === 'yes') {
-      setObj({
-        ...obj,
-        contagion: true,
-      })
-    } else if (e === 'no') {
-      setObj({
-        ...obj,
-        contagion: false,
-      })
-    } else if (e === 'clear') {
-      setObj({
-        ...obj,
-        contagion: undefined,
-      })
-    }
-  }
-
-  //Xử lý thay đổi select cột Emergency
-  const handleChangeEmergency = async (e: string) => {
-    if (e === 'yes') {
-      setObj({
-        ...obj,
-        emergency: true,
-      })
-    } else if (e === 'no') {
-      setObj({
-        ...obj,
-        emergency: false,
-      })
-    } else if (e === 'clear') {
-      setObj({
-        ...obj,
-        emergency: undefined,
-      })
-    }
-  }
-
-  //Xử lý thay đổi select cột Mileage Surcharge
-  const handleChangeMileageSurcharge = async (e: string) => {
-    if (e === 'yes') {
-      setObj({
-        ...obj,
-        mileage_surcharge: true,
-      })
-    } else if (e === 'no') {
-      setObj({
-        ...obj,
-        mileage_surcharge: false,
-      })
-    } else if (e === 'clear') {
-      setObj({
-        ...obj,
-        mileage_surcharge: undefined,
-      })
-    }
-  }
-
-  //Xử lý thay đổi select cột Primary Quote
-  const handleChangePrimaryQuote = async (e: string) => {
-    if (e === 'yes') {
-      setObj({
-        ...obj,
-        primary_quote: true,
-      })
-    } else if (e === 'no') {
-      setObj({
-        ...obj,
-        primary_quote: false,
-      })
-    } else if (e === 'clear') {
-      setObj({
-        ...obj,
-        primary_quote: undefined,
-      })
-    }
-  }
-
-  //Xử lý thay đổi select cột Status
-  const handleChangeStatus = async (e: string) => {
-    setObj({
-      ...obj,
-      status: e,
-    })
-
-    if (e === 'clear') {
-      setObj({
-        ...obj,
-        status: undefined,
-      })
-    }
-  }
-
-  const { Option } = Select
-  function handleChange(value: string) {
-    setValueOption(value)
-  }
 
   const onSelectChange = (
     record: IDataType,
@@ -491,23 +250,14 @@ export default function TableContent() {
     }
   }
 
-  const handleChangeCareRecipientDOB = async (
+  const handleChangeDate = async (
     date: moment.Moment | null,
-    dateString: string
+    dateString: string,
+    key: string
   ) => {
     setObj({
       ...obj,
-      care_recipient_dob: dateString,
-    })
-  }
-
-  const handleChangeStartDate = async (
-    date: moment.Moment | null,
-    dateString: string
-  ) => {
-    setObj({
-      ...obj,
-      start_date: dateString,
+      [key]: dateString,
     })
   }
 
