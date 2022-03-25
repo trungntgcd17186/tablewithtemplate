@@ -1,13 +1,12 @@
-import { Suspense } from 'react'
-import { Route, Switch } from 'react-router-dom'
-import { Layout } from 'antd'
 import ErrorBoundary from '@components/ErrorBoundary'
 import Exception from '@components/Exception'
-import Sider from '@components/Sider'
 import Loading from '@components/Loading'
-
+import Sider from '@components/Sider'
+import { RouteProps, routes } from '@lib/routes'
 import HomePage from '@pages/HomePage'
-import { routes, RouteProps } from '@lib/routes'
+import { Layout } from 'antd'
+import { Suspense } from 'react'
+import { Route, Switch } from 'react-router-dom'
 
 function App() {
   const renderRoute = (route: RouteProps) => {
