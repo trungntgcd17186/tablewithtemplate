@@ -68,6 +68,11 @@
 /* .ant-table-filter-dropdown > Input {
 } */
 
+.status-container {
+  display: flex;
+  justify-content: center;
+}
+
 .status {
   width: 80px;
   background-color: #eaf7fa;

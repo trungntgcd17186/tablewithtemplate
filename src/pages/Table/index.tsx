@@ -9,6 +9,7 @@ import {
   Row,
   Select,
   Table,
+  Tag,
 } from 'antd'
 import 'antd/dist/antd.css'
 import { useEffect, useState } from 'react'
@@ -20,6 +21,7 @@ export default function TableContent() {
   const [obj, setObj] = useState<IFilter>({
     _page: 1,
   })
+
   const [reRender, setReRender] = useState<boolean>(false)
   const [valueOption, setValueOption] = useState<string>('')
   const [arrIds, setArrIds] = useState<React.Key[]>([])
@@ -63,7 +65,7 @@ export default function TableContent() {
     return (
       <div className="select-option">
         {labelHeader}
-        {labelHeader == 'Status' ? (
+        {labelHeader === 'Status' ? (
           <Select
             defaultValue="clear"
             onChange={e => handleChangeOptions(e, key)}>
@@ -100,11 +102,9 @@ export default function TableContent() {
 
   //Xử lý thay đổi select cột short term
   const handleChangeOptions = async (e: boolean | string, key: string) => {
-    if (e == 'clear') {
-      setObj({ ...obj, [key]: undefined })
-    } else {
-      setObj({ ...obj, [key]: e })
-    }
+    e === 'clear'
+      ? setObj({ ...obj, [key]: undefined })
+      : setObj({ ...obj, [key]: e })
   }
 
   const quoteId = 'Quote ID'
@@ -113,6 +113,7 @@ export default function TableContent() {
     {
       title: title(quoteId, ''),
       dataIndex: 'key',
+      render: (text: string) => <div style={{ textAlign: 'left' }}>{text}</div>,
     },
     {
       title: title(careRecipientName, ''),
@@ -123,10 +124,11 @@ export default function TableContent() {
       dataIndex: 'care_recipient_dob',
     },
     {
-      title: () => {
-        return <div className="title-rate">Hour Rate</div>
-      },
+      title: () => <div className="title-rate">Hour Rate</div>,
       dataIndex: 'rate',
+      render: (text: number) => (
+        <Tag style={{ textAlign: 'center' }}>{text}</Tag>
+      ),
     },
     {
       title: selectOptions('Short Term', 'short_temp'),
@@ -158,59 +160,36 @@ export default function TableContent() {
       dataIndex: 'start_date',
     },
     {
-      title: () => {
-        return <div className="title-created">Created Date</div>
-      },
+      title: () => <div className="title-created">Created Date</div>,
       dataIndex: 'created_date',
       key: 'created_date',
-      sorter: (a: IDataType, b: IDataType) => {
-        return (
-          new Date(a.created_date).getTime() -
-          new Date(b.created_date).getTime()
-        )
-      },
-      render(text: IDataType) {
-        return {
-          props: {
-            style: { textAlign: 'right' },
-          },
-          children: <span>{text}</span>,
-        }
-      },
+      sorter: (a: IDataType, b: IDataType) =>
+        new Date(a.created_date).getTime() - new Date(b.created_date).getTime(),
+      render: (text: IDataType) => <span>{text}</span>,
     },
     {
       title: () => {
         return <div className="title-created">Created By</div>
       },
       dataIndex: 'created_by',
-
-      sorter: (a: IDataType, b: IDataType) => {
-        return a.created_by.length - b.created_by.length
-      },
+      sorter: (a: IDataType, b: IDataType) =>
+        a.created_by.length - b.created_by.length,
     },
     {
-      title: () => {
-        return <div className="title-created">Updated Date</div>
-      },
+      title: () => <div className="title-created">Updated Date</div>,
       dataIndex: 'updated_date',
       key: 'updated_date',
-      sorter: (a: IDataType, b: IDataType) => {
-        return (
-          new Date(a.updated_date).getTime() -
-          new Date(b.updated_date).getTime()
-        )
-      },
+      sorter: (a: IDataType, b: IDataType) =>
+        new Date(a.updated_date).getTime() - new Date(b.updated_date).getTime(),
     },
     {
       title: selectOptions('Status', 'status'),
       dataIndex: 'status',
-      render(text: string) {
-        return (
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <div className="status">{text}</div>
-          </div>
-        )
-      },
+      render: (text: string) => (
+        <div className="status-container">
+          <Tag className="status">{text}</Tag>
+        </div>
+      ),
     },
     {
       title: '...',
@@ -218,6 +197,7 @@ export default function TableContent() {
     },
   ]
 
+  //Truyền id checkbox vào array để cung cấp id cho việc edit hoặc xóa nhiều rows.
   const onSelectChange = (
     record: IDataType,
     selected: boolean,
@@ -276,7 +256,6 @@ export default function TableContent() {
       <Layout>
         <Row>
           <Col span="8">
-            {' '}
             <Select
               defaultValue="Change Status"
               style={{ width: '68%', textAlign: 'left' }}
