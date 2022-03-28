@@ -1,36 +1,11 @@
-import React from 'react'
-
 import { UseQueryOptions } from '@lib/types'
-
 import useQuery from '@lib/useQuery'
+import React from 'react'
+import { IDataType } from '@lib/types'
 
-export type User = {
-  id: number
-  name: string
-  username: string
-  email: string
-  address: {
-    street: string
-    suite: string
-    city: string
-    zipcode: string
-    geo: {
-      lat: number
-      lng: number
-    }
-  }
-  phone: string
-  website: string
-  company: {
-    name: string
-    catchPhrase: string
-    bs: string
-  }
-}
-
-export const useUsers = (options?: UseQueryOptions) => {
-  const { data, ...rest } = useQuery<User[]>(
-    `https://jsonplaceholder.typicode.com/users`,
+export const useDatas = (options?: UseQueryOptions) => {
+  const { data, ...rest } = useQuery<IDataType[]>(
+    `https://tablemanage.herokuapp.com/table`,
     options
   )
 
@@ -40,13 +15,13 @@ export const useUsers = (options?: UseQueryOptions) => {
   }
 }
 
-export const useQueryUser = ({
+export const useQueryDatas = ({
   variables,
   ...options
 }: UseQueryOptions = {}) => {
   const [query, setQuery] = React.useState<{ [key: string]: any }>()
-  const { data, ...rest } = useQuery<User>(
-    `https://jsonplaceholder.typicode.com/users/{id}`,
+  const { data, ...rest } = useQuery<IDataType>(
+    `https://tablemanage.herokuapp.com/table/{id}`,
     {
       ...options,
       variables: { ...variables, ...query },

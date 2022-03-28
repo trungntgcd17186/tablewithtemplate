@@ -1,11 +1,11 @@
-import React from 'react'
-import { Row, Col, Table, Input } from 'antd'
-import { ColumnProps, TablePaginationConfig } from 'antd/lib/table'
-import { FilterValue, SorterResult } from 'antd/lib/table/interface'
 import Layout from '@components/Layout'
 import useModal from '@hooks/useModal'
 import IconEdit from '@icons/Edit'
-import { useUsers, useQueryUser, User } from './queries'
+import { Col, Input, Row, Table } from 'antd'
+import { ColumnProps, TablePaginationConfig } from 'antd/lib/table'
+import { FilterValue, SorterResult } from 'antd/lib/table/interface'
+import React from 'react'
+import { useQueryUser, User, useUsers } from './queries'
 import UserModal from './UserModal'
 
 export default function Home() {

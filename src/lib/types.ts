@@ -24,3 +24,35 @@ export interface MutationOptions<T = any>
   displayMessage?: boolean
   displayError?: boolean
 }
+
+export interface IDataType {
+  key: React.Key
+  id: number
+  care_recipient_name: string
+  care_recipient_dob: string
+  rate: number
+  short_temp: boolean
+  contagion: boolean
+  emergency: boolean
+  mileage_surcharge?: boolean
+  primary_quote: boolean
+  start_date: string
+  created_date: string
+  created_by: string
+  updated_date: string
+  status: string
+}
+
+export interface IFilter {
+  care_recipient_name?: string
+  care_recipient_dob?: string
+  short_temp?: boolean
+  contagion?: boolean
+  emergency?: boolean
+  mileage_surcharge?: boolean
+  primary_quote?: boolean
+  start_date?: string
+  status?: string
+  _page?: number
+  q?: string
+}

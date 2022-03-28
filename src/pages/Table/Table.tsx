@@ -1,5 +1,6 @@
 import { DeleteFilled } from '@ant-design/icons'
 import Layout from '@components/Layout'
+import { IDataType, IFilter } from '@lib/types'
 import {
   Button,
   Col,
@@ -10,46 +11,47 @@ import {
   Select,
   Table,
   Tag,
+  notification,
 } from 'antd'
 import 'antd/dist/antd.css'
 import { useEffect, useState } from 'react'
 import fetchData, { deleteData, editData } from '../../api/index'
 import './index.css'
+import { useQueryDatas, useDatas } from './queries'
+
+const { Option } = Select
+interface objType {
+  [key: string]: string | number | boolean | React.ChangeEvent<HTMLInputElement>
+}
 
 export default function TableContent() {
-  const [datas, setDatas] = useState<IDataType[]>([])
-  const [obj, setObj] = useState<IFilter>({
+  const [valueOption, setValueOption] = useState<string>('')
+  const [arrIds, setArrIds] = useState<React.Key[]>([])
+  const [filter, setFilter] = useState<{ [key: string]: any }>({
     _page: 1,
   })
 
-  const [reRender, setReRender] = useState<boolean>(false)
-  const [valueOption, setValueOption] = useState<string>('')
-  const [arrIds, setArrIds] = useState<React.Key[]>([])
-
-  //Call lại Api sau khi obj thay đổi.
-  useEffect(() => {
-    async function fetchMyAPI() {
-      const response = await fetchData(obj)
-      setDatas(response.data)
-    }
-    fetchMyAPI()
-  }, [obj, reRender])
-
-  const { Option } = Select
   const handleChange = (value: string) => setValueOption(value)
+
+  const { data, isFetching, refetch } = useDatas({
+    variables: filter,
+  })
 
   const title = (labelHeader: string, key: string) => (
     <div className="center">
       {labelHeader}
       {labelHeader === quoteId || labelHeader === careRecipientName ? (
         <div className="title-input-search">
-          <Input style={{ width: 'auto' }} onChange={e => handleSearch(e)} />
+          <Input
+            style={{ width: 'auto' }}
+            onChange={e => handleFilter({ [key]: e.target.value })}
+          />
         </div>
       ) : (
         <div className="title-input-search dob">
           <DatePicker
             onChange={(date: moment.Moment | null, dateString: string) =>
-              handleChangeDate(date, dateString, key)
+              handleFilter({ [key]: dateString })
             }
           />
         </div>
@@ -61,22 +63,16 @@ export default function TableContent() {
     <div className="select-option">
       {labelHeader}
       {labelHeader === 'Status' ? (
-        <Select
-          defaultValue="clear"
-          onChange={e => handleChangeOptions(e, key)}>
+        <Select allowClear onChange={e => handleFilter({ [key]: e })}>
           <Option value="new">new</Option>
           <Option value="approved">approved</Option>
           <Option value="rejected">rejected</Option>
           <Option value="closed">closed</Option>
-          <Option value="clear">--</Option>
         </Select>
       ) : (
-        <Select
-          defaultValue="clear"
-          onChange={e => handleChangeOptions(e, key)}>
+        <Select allowClear onChange={e => handleFilter({ [key]: e })}>
           <Option value="true">YES</Option>
           <Option value="false">NO</Option>
-          <Option value="clear">--</Option>
         </Select>
       )}
     </div>
@@ -84,36 +80,27 @@ export default function TableContent() {
 
   const OptionValue = (value: boolean) => (
     <div className="center">
-      {value === true ? (
-        <span style={{ color: '#008DFF' }}>YES</span>
-      ) : (
-        <span style={{ color: '#FF0000' }}>NO</span>
-      )}
+      <span style={value ? { color: '#008DFF' } : { color: '#FF0000' }}>
+        {value ? 'YES' : 'NO'}
+      </span>
     </div>
   )
-
-  //Xử lý thay đổi select options
-  const handleChangeOptions = async (e: boolean | string, key: string) => {
-    e === 'clear'
-      ? setObj({ ...obj, [key]: undefined })
-      : setObj({ ...obj, [key]: e })
-  }
 
   const quoteId = 'Quote ID'
   const careRecipientName = 'Care Recipient Name'
   const columns = [
     {
-      title: title(quoteId, ''),
+      title: title(quoteId, 'q'),
       dataIndex: 'key',
       render: (id: string) => <div style={{ textAlign: 'left' }}>{id}</div>,
     },
     {
-      title: title(careRecipientName, ''),
-      dataIndex: 'care_recipient_name',
+      title: title(careRecipientName, 'q'),
+      dataIndex: 'careRecipientName',
     },
     {
       title: title('Care Recipient DOB', 'care_recipient_dob'),
-      dataIndex: 'care_recipient_dob',
+      dataIndex: 'careRecipientDob',
     },
     {
       title: () => <div className="title-rate">Hour Rate</div>,
@@ -122,7 +109,7 @@ export default function TableContent() {
     },
     {
       title: selectOptions('Short Term', 'short_temp'),
-      dataIndex: 'short_temp',
+      dataIndex: 'shortTemp',
       render: OptionValue,
     },
     {
@@ -137,17 +124,17 @@ export default function TableContent() {
     },
     {
       title: selectOptions('Mileage Surcharge', 'mileage_surcharge'),
-      dataIndex: 'mileage_surcharge',
+      dataIndex: 'mileageSurcharge',
       render: OptionValue,
     },
     {
       title: selectOptions('Primary Quote', 'primary_quote'),
-      dataIndex: 'primary_quote',
+      dataIndex: 'primaryQuote',
       render: OptionValue,
     },
     {
       title: title('Start Date', 'start_date'),
-      dataIndex: 'start_date',
+      dataIndex: 'startDate',
     },
     {
       title: () => <div className="title-created">Created Date</div>,
@@ -158,13 +145,13 @@ export default function TableContent() {
     },
     {
       title: () => <div className="title-created">Created By</div>,
-      dataIndex: 'created_by',
+      dataIndex: 'createdBy',
       sorter: (a: IDataType, b: IDataType) =>
         a.created_by.length - b.created_by.length,
     },
     {
       title: () => <div className="title-created">Updated Date</div>,
-      dataIndex: 'updated_date',
+      dataIndex: 'updatedDate',
       sorter: (a: IDataType, b: IDataType) =>
         new Date(a.updated_date).getTime() - new Date(b.updated_date).getTime(),
     },
@@ -201,39 +188,26 @@ export default function TableContent() {
   const handleCheckboxChangeData = async () => {
     if (valueOption === 'delete') {
       await deleteData(arrIds)
-      setReRender(!reRender)
-      alert('successful delete')
+      refetch()
+      openNotification('Delete')
     } else {
       await editData(arrIds, valueOption)
-      setReRender(!reRender)
-      alert('successful change status')
+      refetch()
+      openNotification('Change Status')
     }
   }
 
-  const handleChangeDate = async (
-    date: moment.Moment | null,
-    dateString: string,
-    key: string
-  ) => {
-    setObj({
-      ...obj,
-      [key]: dateString,
-    })
+  //Xử lý filter
+  const handleFilter = (object: objType) => {
+    setFilter({ ...filter, ...object })
   }
 
-  //Xử lý change page
-  const handleChangePage = async (page: number) => {
-    setObj({
-      ...obj,
-      _page: page,
-    })
-  }
-
-  //Xử lý search theo cột Care Recipient Name, Quote ID
-  const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setObj({
-      ...obj,
-      q: e.target.value,
+  //Xuat hien thong bao
+  const openNotification = (des: any) => {
+    notification.info({
+      message: `Notification`,
+      description: `${des} Success`,
+      placement: 'top',
     })
   }
 
@@ -261,11 +235,15 @@ export default function TableContent() {
               type: 'checkbox',
               ...rowSelection,
             }}
-            dataSource={datas}
+            dataSource={data}
             columns={columns}
+            loading={isFetching}
             pagination={false}
           />
-          <Pagination onChange={handleChangePage} total={100} />
+          <Pagination
+            onChange={page => handleFilter({ _page: page })}
+            total={100}
+          />
         </Col>
       </Row>
     </Layout>
