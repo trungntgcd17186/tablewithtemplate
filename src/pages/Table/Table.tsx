@@ -1,23 +1,22 @@
 import { DeleteFilled } from '@ant-design/icons'
 import Layout from '@components/Layout'
-import { IDataType, IFilter } from '@lib/types'
+import { IDataType } from '@lib/types'
 import {
   Button,
   Col,
   DatePicker,
   Input,
+  notification,
   Pagination,
   Row,
   Select,
   Table,
   Tag,
-  notification,
 } from 'antd'
 import 'antd/dist/antd.css'
-import { useEffect, useState } from 'react'
-import fetchData, { deleteData, editData } from '../../api/index'
+import { useState } from 'react'
 import './index.css'
-import { useQueryDatas, useDatas } from './queries'
+import { useDatas, useUpdateDatas, useDeleteDatas } from './queries'
 
 const { Option } = Select
 interface objType {
@@ -26,12 +25,10 @@ interface objType {
 
 export default function TableContent() {
   const [valueOption, setValueOption] = useState<string>('')
-  const [arrIds, setArrIds] = useState<React.Key[]>([])
+  const [getDataSelected, setGetDataSelected] = useState<IDataType[]>([])
   const [filter, setFilter] = useState<{ [key: string]: any }>({
     _page: 1,
   })
-
-  const handleChange = (value: string) => setValueOption(value)
 
   const { data, isFetching, refetch } = useDatas({
     variables: filter,
@@ -44,7 +41,7 @@ export default function TableContent() {
         <div className="title-input-search">
           <Input
             style={{ width: 'auto' }}
-            onChange={e => handleFilter({ [key]: e.target.value })}
+            onChange={e => handleFilter({ [key]: e.target.value.trim() })}
           />
         </div>
       ) : (
@@ -177,29 +174,50 @@ export default function TableContent() {
     selectedRows: IDataType[]
   ) => {
     const array: number[] = []
-    selectedRows.map((el: { id: number }) => array.push(el.id))
-    setArrIds(array)
+    setGetDataSelected(selectedRows)
   }
 
   const rowSelection = {
     onSelect: onSelectChange,
   }
+
+  const handleChange = (value: string) => setValueOption(value)
   //Xử lý action change data theo checkbox và checkbox all
-  const handleCheckboxChangeData = async () => {
+  const mutationOpts = {
+    onSuccess: () => {
+      refetch()
+      openNotification('Change Success')
+    },
+  }
+
+  const handleUpdateStatus = useUpdateDatas(mutationOpts)
+  const handleDeleteRows = useDeleteDatas(mutationOpts)
+
+  const handleCheckboxChangeData = () => {
     if (valueOption === 'delete') {
-      await deleteData(arrIds)
-      refetch()
-      openNotification('Delete')
+      getDataSelected.map(el => handleDeleteRows({ ...el }))
     } else {
-      await editData(arrIds, valueOption)
-      refetch()
-      openNotification('Change Status')
+      getDataSelected.map(el =>
+        handleUpdateStatus({ ...el, status: valueOption })
+      )
     }
   }
 
   //Xử lý filter
   const handleFilter = (object: objType) => {
     setFilter({ ...filter, ...object })
+    // window.location.href = `http://localhost:3000/quotes/${{
+    //   ...filter,
+    //   ...object,
+    // }}`
+
+    const myObject = { ...filter, ...object }
+
+    var abc = '?'
+    for (const [key, value] of Object.entries(myObject)) {
+      abc = abc + `${key}=${value}&`
+    }
+    window.location.href = abc
   }
 
   //Xuat hien thong bao

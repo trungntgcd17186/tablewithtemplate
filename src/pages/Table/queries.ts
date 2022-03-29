@@ -2,6 +2,8 @@ import { UseQueryOptions } from '@lib/types'
 import useQuery from '@lib/useQuery'
 import React from 'react'
 import { IDataType } from '@lib/types'
+import { useMutation } from 'react-query'
+import { request } from '@utils/request'
 
 export const useDatas = (options?: UseQueryOptions) => {
   const { data, ...rest } = useQuery<IDataType[]>(
@@ -15,27 +17,32 @@ export const useDatas = (options?: UseQueryOptions) => {
   }
 }
 
-export const useQueryDatas = ({
-  variables,
-  ...options
-}: UseQueryOptions = {}) => {
-  const [query, setQuery] = React.useState<{ [key: string]: any }>()
-  const { data, ...rest } = useQuery<IDataType>(
-    `https://tablemanage.herokuapp.com/table/{id}`,
+export const useUpdateDatas = (options: any) => {
+  const { mutate } = useMutation(
+    (data: Partial<IDataType | undefined>) =>
+      request('https://tablemanage.herokuapp.com/table/{id}', {
+        method: 'PUT',
+        body: data,
+      }),
     {
       ...options,
-      variables: { ...variables, ...query },
-      enabled: !!variables?.id || !!query?.id,
     }
   )
 
-  const refetch = (values: { [key: string]: any }) => {
-    setQuery(values)
-  }
+  return mutate
+}
 
-  return {
-    ...rest,
-    data,
-    refetch,
-  }
+export const useDeleteDatas = (options: any) => {
+  const { mutate } = useMutation(
+    (data: Partial<IDataType | undefined>) =>
+      request('https://tablemanage.herokuapp.com/table/{id}', {
+        method: 'DELETE',
+        body: data,
+      }),
+    {
+      ...options,
+    }
+  )
+
+  return mutate
 }
