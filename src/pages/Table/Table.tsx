@@ -14,25 +14,29 @@ import {
   Tag,
 } from 'antd'
 import 'antd/dist/antd.css'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './index.css'
 import { useDatas, useUpdateDatas, useDeleteDatas } from './queries'
 
 const { Option } = Select
 interface objType {
-  [key: string]: string | number | boolean | React.ChangeEvent<HTMLInputElement>
+  [key: string]: string | number | boolean | React.ChangeEvent<HTMLElement>
 }
 
 export default function TableContent() {
   const [valueOption, setValueOption] = useState<string>('')
   const [getDataSelected, setGetDataSelected] = useState<IDataType[]>([])
-  const [filter, setFilter] = useState<{ [key: string]: any }>({
-    _page: 1,
-  })
+
+  const [filter, setFilter] = useState<{ [key: string]: any }>({ _page: 1 })
 
   const { data, isFetching, refetch } = useDatas({
     variables: filter,
   })
+
+  //Xử lý f5 không mất filter
+  useEffect(() => {
+    handleUrl()
+  }, [])
 
   const title = (labelHeader: string, key: string) => (
     <div className="center">
@@ -67,7 +71,10 @@ export default function TableContent() {
           <Option value="closed">closed</Option>
         </Select>
       ) : (
-        <Select allowClear onChange={e => handleFilter({ [key]: e })}>
+        <Select
+          // defaultValue="true"
+          allowClear
+          onChange={e => handleFilter({ [key]: e })}>
           <Option value="true">YES</Option>
           <Option value="false">NO</Option>
         </Select>
@@ -204,20 +211,32 @@ export default function TableContent() {
   }
 
   //Xử lý filter
+  var url = '?'
   const handleFilter = (object: objType) => {
-    setFilter({ ...filter, ...object })
-    // window.location.href = `http://localhost:3000/quotes/${{
-    //   ...filter,
-    //   ...object,
-    // }}`
-
     const myObject = { ...filter, ...object }
 
-    var abc = '?'
     for (const [key, value] of Object.entries(myObject)) {
-      abc = abc + `${key}=${value}&`
+      if (value !== undefined) {
+        url = url + `${key}=${value}&`
+      }
     }
-    window.location.href = abc
+    setFilter(myObject)
+    window.history.replaceState(null, document.title, url)
+  }
+
+  let obj = { _page: 1 }
+  let element: any = {}
+
+  const handleUrl = () => {
+    let paramString = window.location.href.split('?')[1]
+    let queryString = new URLSearchParams(paramString)
+
+    for (let pair of queryString.entries()) {
+      element[pair[0]] = pair[1]
+      obj = { ...obj, ...element }
+    }
+
+    setFilter(obj)
   }
 
   //Xuat hien thong bao
