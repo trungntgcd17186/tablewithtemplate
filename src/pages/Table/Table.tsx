@@ -33,7 +33,7 @@ export default function TableContent() {
     variables: filter,
   })
 
-  //Xử lý f5 không mất filter
+  //Xử lý f5 không mất filter khi luôn chạy hàm handleUrl để get param url cho filter.
   useEffect(() => {
     handleUrl()
   }, [])
@@ -72,7 +72,7 @@ export default function TableContent() {
         </Select>
       ) : (
         <Select
-          // defaultValue="true"
+          defaultValue={'true'}
           allowClear
           onChange={e => handleFilter({ [key]: e })}>
           <Option value="true">YES</Option>
@@ -213,26 +213,36 @@ export default function TableContent() {
   //Xử lý filter
   var url = '?'
   const handleFilter = (object: objType) => {
+    //gán object chứa filter cho myObject
     const myObject = { ...filter, ...object }
 
+    //Chạy vòng for of để convert từ key: value sang key=value&
     for (const [key, value] of Object.entries(myObject)) {
       if (value !== undefined) {
         url = url + `${key}=${value}&`
       }
     }
+    //Set filter state để filter khi chưa f5 lại trang.
     setFilter(myObject)
+    //Đưa param lên url tạm thời, chưa f5 trang.
     window.history.replaceState(null, document.title, url)
   }
 
+  //Tạo 2 object để chứa key và value sau khi get key value từ param.
   let obj = { _page: 1 }
   let element: any = {}
 
   const handleUrl = () => {
+    //Loại bỏ dấu ?
     let paramString = window.location.href.split('?')[1]
+    //Convert sang Url đúng cú pháp hỗ trợ.
     let queryString = new URLSearchParams(paramString)
+
+    //Chạy vòng for of để add cặp key + value vào element
 
     for (let pair of queryString.entries()) {
       element[pair[0]] = pair[1]
+      //Lưu lại các cặp key value trước đó, add các cặp key value tiếp theo từ param url còn lại khi chạy vòng for of.
       obj = { ...obj, ...element }
     }
 
