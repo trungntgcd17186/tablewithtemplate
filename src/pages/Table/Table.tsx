@@ -1,6 +1,6 @@
 import { DeleteFilled } from '@ant-design/icons'
 import Layout from '@components/Layout'
-import { IDataType } from '@lib/types'
+import { IDataType, IOptionDefault, objType } from '@lib/types'
 import {
   Button,
   Col,
@@ -14,73 +14,92 @@ import {
   Tag,
 } from 'antd'
 import 'antd/dist/antd.css'
-import { useEffect, useState } from 'react'
+import moment from 'moment'
+import React, { useEffect, useState } from 'react'
+import { useHistory, useLocation } from 'react-router-dom'
+import DeleteModal from '../Table/DeleteModal'
 import './index.css'
-import { useDatas, useUpdateDatas, useDeleteDatas } from './queries'
+import { useDatas, useDeleteDatas, useUpdateDatas } from './queries'
 
 const { Option } = Select
-interface objType {
-  [key: string]: string | number | boolean | React.ChangeEvent<HTMLElement>
-}
 
 export default function TableContent() {
   const [valueOption, setValueOption] = useState<string>('')
   const [getDataSelected, setGetDataSelected] = useState<IDataType[]>([])
+  const [filter, setFilter] = useState<objType>({ _page: 1 })
 
-  const [filter, setFilter] = useState<{ [key: string]: any }>({ _page: 1 })
+  let history = useHistory()
+  let location = useLocation()
+  const dateFormat = 'YYYY-MM-DD'
 
+  const [isModalVisible, setIsModalVisible] = useState(false)
+
+  //Xử lý show modal
+  const showModal = () => {
+    if (getDataSelected.length >= 1) {
+      setIsModalVisible(true)
+    } else {
+      openNotification('Please select row before taking action')
+    }
+  }
+
+  //Xử lý f5 không mất filter khi luôn chạy hàm handleUrl để get param url cho filter. Xử lý đổi page xóa checkbox.
+  useEffect(() => {
+    handleUrl()
+    setGetDataSelected([])
+  }, [filter._page])
+
+  //Xử lý filter
   const { data, isFetching, refetch } = useDatas({
     variables: filter,
   })
 
-  //Xử lý f5 không mất filter khi luôn chạy hàm handleUrl để get param url cho filter.
-  useEffect(() => {
-    handleUrl()
-  }, [])
+  const handleFilter = (object: objType) => {
+    //gán object chứa filter cho myObject
+    const myObject = { ...filter, ...object }
+    let url = '?'
+    //Chạy vòng for of để convert từ key: value sang key=value&
+    for (const [key, value] of Object.entries(myObject)) {
+      if (value !== undefined) {
+        url = url + `${key}=${value}&`
+      }
+    }
+    //Đưa param lên url tạm thời, chưa f5 trang.
+    history.push(url)
+    //Set filter state để filter khi chưa f5 lại trang.
+    setFilter(myObject)
+  }
 
-  const title = (labelHeader: string, key: string) => (
-    <div className="center">
-      {labelHeader}
-      {labelHeader === quoteId || labelHeader === careRecipientName ? (
-        <div className="title-input-search">
-          <Input
-            style={{ width: 'auto' }}
-            onChange={e => handleFilter({ [key]: e.target.value.trim() })}
-          />
-        </div>
-      ) : (
-        <div className="title-input-search dob">
-          <DatePicker
-            onChange={(date: moment.Moment | null, dateString: string) =>
-              handleFilter({ [key]: dateString })
-            }
-          />
-        </div>
-      )}
-    </div>
-  )
+  //Convert sang Url đúng cú pháp hỗ trợ.
+  let queryString = new URLSearchParams(location.search)
+  //Tạo 2 object để chứa key và value sau khi get key value từ param.
+  let element: { [key: string]: string } = {}
+  let obj = { _page: 1 }
 
-  const selectOptions = (labelHeader: string, key: string) => (
-    <div className="select-option">
-      {labelHeader}
-      {labelHeader === 'Status' ? (
-        <Select allowClear onChange={e => handleFilter({ [key]: e })}>
-          <Option value="new">new</Option>
-          <Option value="approved">approved</Option>
-          <Option value="rejected">rejected</Option>
-          <Option value="closed">closed</Option>
-        </Select>
-      ) : (
-        <Select
-          defaultValue={'true'}
-          allowClear
-          onChange={e => handleFilter({ [key]: e })}>
-          <Option value="true">YES</Option>
-          <Option value="false">NO</Option>
-        </Select>
-      )}
-    </div>
-  )
+  const handleUrl = () => {
+    //Chạy vòng for of để add cặp key + value vào element
+    for (let pair of queryString.entries()) {
+      element[pair[0]] = pair[1]
+      //Lưu lại các cặp key value trước đó, add các cặp key value tiếp theo từ param url còn lại khi chạy vòng for of.
+      obj = { ...obj, ...element }
+    }
+    //Set filter state lúc vừa mới reload trang xong.
+    setFilter(obj)
+  }
+
+  //Xử lý set default value cho tất cả các cột filter.
+  const handleDefault = (key: string) => {
+    let optionDefault: IOptionDefault = {}
+
+    for (let pair of queryString.entries()) {
+      element[pair[0]] = pair[1]
+      //Lưu lại các cặp key value trước đó, add các cặp key value tiếp theo từ param url còn lại khi chạy vòng for of.
+      optionDefault = { ...optionDefault, ...element }
+    }
+
+    //Trả về cho default value bằng value có key = key
+    return optionDefault[key]
+  }
 
   const OptionValue = (value: boolean) => (
     <div className="center">
@@ -92,6 +111,121 @@ export default function TableContent() {
 
   const quoteId = 'Quote ID'
   const careRecipientName = 'Care Recipient Name'
+  //In ra title cho từng cột của table bằng cách gọi hàm title, selectOptions truyền vào label và key để handle onChange
+
+  //Truyền id checkbox vào array để cung cấp id cho việc edit hoặc xóa nhiều rows.
+  const onSelectChange = (
+    record: IDataType,
+    selected: boolean,
+    selectedRows: IDataType[]
+  ) => {
+    const array: number[] = []
+    setGetDataSelected(selectedRows)
+  }
+
+  const deSelectChange = (
+    record: IDataType,
+    selected: boolean,
+    selectedRows: IDataType[]
+  ) => {
+    selected = false
+  }
+
+  const rowSelection = {
+    onSelect: onSelectChange,
+    deSelect: deSelectChange,
+  }
+
+  const handleChange = (value: string) => setValueOption(value)
+
+  const mutationOpts = {
+    onSuccess: () => {
+      refetch()
+    },
+  }
+
+  const handleUpdateStatus = useUpdateDatas(mutationOpts)
+  const handleDeleteRows = useDeleteDatas(mutationOpts)
+  //Xử lý action change data theo checkbox và checkbox all
+  const handleCheckboxChangeData = () => {
+    if (getDataSelected.length >= 1) {
+      if (valueOption === 'delete' && getDataSelected.length >= 1) {
+        getDataSelected.map(el =>
+          el !== undefined ? handleDeleteRows({ ...el }) : ''
+        )
+      }
+      if (valueOption !== 'delete' && getDataSelected.length >= 1) {
+        getDataSelected.map(el =>
+          el !== undefined
+            ? handleUpdateStatus({ ...el, status: valueOption })
+            : ''
+        )
+      }
+    } else {
+      openNotification('Please select row before taking action')
+    }
+    setGetDataSelected([])
+  }
+
+  //Xuat hien thong bao
+  const openNotification = (des: string) => {
+    notification.info({
+      message: `Notification`,
+      description: des,
+      placement: 'top',
+    })
+  }
+
+  const title = (label: string, key: string) => (
+    <div className="center">
+      {label}
+      {label === quoteId || label === careRecipientName ? (
+        <div className="title-input-search">
+          <Input
+            value={handleDefault(key)}
+            style={{ width: 'auto' }}
+            onChange={e => handleFilter({ [key]: e.target.value.trim() })}
+          />
+        </div>
+      ) : (
+        <div className="title-input-search dob">
+          <DatePicker
+            defaultValue={moment(handleDefault(key))}
+            format={dateFormat}
+            onChange={(date: moment.Moment | null, dateString: string) =>
+              handleFilter({ [key]: dateString })
+            }
+          />
+        </div>
+      )}
+    </div>
+  )
+
+  const selectOptions = (label: string, key: string) => (
+    <div className="select-option">
+      {label}
+      {label === 'Status' ? (
+        <Select
+          defaultValue={handleDefault(key)}
+          allowClear
+          onChange={e => handleFilter({ [key]: e })}>
+          <Option value="new">new</Option>
+          <Option value="approved">approved</Option>
+          <Option value="rejected">rejected</Option>
+          <Option value="closed">closed</Option>
+        </Select>
+      ) : (
+        <Select
+          defaultValue={handleDefault(key)}
+          allowClear
+          onChange={e => handleFilter({ [key]: e })}>
+          <Option value="true">YES</Option>
+          <Option value="false">NO</Option>
+        </Select>
+      )}
+    </div>
+  )
+
   const columns = [
     {
       title: title(quoteId, 'q'),
@@ -170,94 +304,11 @@ export default function TableContent() {
     },
     {
       title: '...',
-      render: () => <DeleteFilled style={{ color: 'orange' }} />,
+      render: () => (
+        <DeleteFilled onClick={showModal} style={{ color: 'orange' }} />
+      ),
     },
   ]
-
-  //Truyền id checkbox vào array để cung cấp id cho việc edit hoặc xóa nhiều rows.
-  const onSelectChange = (
-    record: IDataType,
-    selected: boolean,
-    selectedRows: IDataType[]
-  ) => {
-    const array: number[] = []
-    setGetDataSelected(selectedRows)
-  }
-
-  const rowSelection = {
-    onSelect: onSelectChange,
-  }
-
-  const handleChange = (value: string) => setValueOption(value)
-  //Xử lý action change data theo checkbox và checkbox all
-  const mutationOpts = {
-    onSuccess: () => {
-      refetch()
-      openNotification('Change Success')
-    },
-  }
-
-  const handleUpdateStatus = useUpdateDatas(mutationOpts)
-  const handleDeleteRows = useDeleteDatas(mutationOpts)
-
-  const handleCheckboxChangeData = () => {
-    if (valueOption === 'delete') {
-      getDataSelected.map(el => handleDeleteRows({ ...el }))
-    } else {
-      getDataSelected.map(el =>
-        handleUpdateStatus({ ...el, status: valueOption })
-      )
-    }
-  }
-
-  //Xử lý filter
-  var url = '?'
-  const handleFilter = (object: objType) => {
-    //gán object chứa filter cho myObject
-    const myObject = { ...filter, ...object }
-
-    //Chạy vòng for of để convert từ key: value sang key=value&
-    for (const [key, value] of Object.entries(myObject)) {
-      if (value !== undefined) {
-        url = url + `${key}=${value}&`
-      }
-    }
-    //Set filter state để filter khi chưa f5 lại trang.
-    setFilter(myObject)
-    //Đưa param lên url tạm thời, chưa f5 trang.
-    window.history.replaceState(null, document.title, url)
-  }
-
-  //Tạo 2 object để chứa key và value sau khi get key value từ param.
-  let obj = { _page: 1 }
-  let element: any = {}
-
-  const handleUrl = () => {
-    //Loại bỏ dấu ?
-    let paramString = window.location.href.split('?')[1]
-    //Convert sang Url đúng cú pháp hỗ trợ.
-    let queryString = new URLSearchParams(paramString)
-
-    //Chạy vòng for of để add cặp key + value vào element
-
-    for (let pair of queryString.entries()) {
-      element[pair[0]] = pair[1]
-      //Lưu lại các cặp key value trước đó, add các cặp key value tiếp theo từ param url còn lại khi chạy vòng for of.
-      obj = { ...obj, ...element }
-    }
-
-    setFilter(obj)
-  }
-
-  //Xuat hien thong bao
-  const openNotification = (des: any) => {
-    notification.info({
-      message: `Notification`,
-      description: `${des} Success`,
-      placement: 'top',
-    })
-  }
-
   return (
     <Layout>
       <Row>
@@ -287,12 +338,20 @@ export default function TableContent() {
             loading={isFetching}
             pagination={false}
           />
+
           <Pagination
             onChange={page => handleFilter({ _page: page })}
             total={100}
           />
         </Col>
       </Row>
+      <DeleteModal
+        getDataSelected={getDataSelected}
+        mutationOpts={mutationOpts}
+        isModalVisible={isModalVisible}
+        setIsModalVisible={setIsModalVisible}
+        setGetDataSelected={setGetDataSelected}
+      />
     </Layout>
   )
 }

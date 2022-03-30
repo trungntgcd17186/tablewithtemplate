@@ -56,3 +56,16 @@ export interface IFilter {
   _page?: number
   q?: string
 }
+
+export interface IOptionDefault {
+  [key: string]: string
+}
+
+export interface objType {
+  [key: string]:
+    | string
+    | number
+    | boolean
+    | React.ChangeEvent<HTMLElement>
+    | void
+}
