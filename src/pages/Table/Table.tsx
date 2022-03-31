@@ -28,6 +28,10 @@ export default function TableContent() {
   const [getDataSelected, setGetDataSelected] = useState<IDataType[]>([])
   const [filter, setFilter] = useState<objType>({ _page: 1 })
 
+  const [select, setSelect] = useState({
+    selectedRowKeys: [],
+  })
+
   let history = useHistory()
   let location = useLocation()
   const dateFormat = 'YYYY-MM-DD'
@@ -47,6 +51,7 @@ export default function TableContent() {
   useEffect(() => {
     handleUrl()
     setGetDataSelected([])
+    setSelect({ selectedRowKeys: [] })
   }, [filter._page])
 
   //Xử lý filter
@@ -113,27 +118,26 @@ export default function TableContent() {
   const careRecipientName = 'Care Recipient Name'
   //In ra title cho từng cột của table bằng cách gọi hàm title, selectOptions truyền vào label và key để handle onChange
 
+  const { selectedRowKeys } = select
+
   //Truyền id checkbox vào array để cung cấp id cho việc edit hoặc xóa nhiều rows.
   const onSelectChange = (
     record: IDataType,
     selected: boolean,
     selectedRows: IDataType[]
   ) => {
-    const array: number[] = []
     setGetDataSelected(selectedRows)
   }
 
-  const deSelectChange = (
-    record: IDataType,
-    selected: boolean,
-    selectedRows: IDataType[]
-  ) => {
-    selected = false
-  }
-
   const rowSelection = {
+    selectedRowKeys,
+    onChange: (selectedRowKeys: any) => {
+      setSelect({
+        ...select,
+        selectedRowKeys: selectedRowKeys,
+      })
+    },
     onSelect: onSelectChange,
-    deSelect: deSelectChange,
   }
 
   const handleChange = (value: string) => setValueOption(value)
@@ -151,6 +155,7 @@ export default function TableContent() {
     if (getDataSelected.length >= 1) {
       if (valueOption === 'delete' && getDataSelected.length >= 1) {
         getDataSelected.map(el =>
+          //checkID khác undefined thì mới action tránh lỗi undefined request.
           el !== undefined ? handleDeleteRows({ ...el }) : ''
         )
       }
