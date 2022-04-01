@@ -181,15 +181,30 @@ export default function TableContent() {
     })
   }
 
+  function debounce<Params extends any[]>(
+    func: (...args: Params) => any,
+    timeout: number = 1000
+  ): (...args: Params) => void {
+    let timer: NodeJS.Timeout
+    return (...args: Params) => {
+      clearTimeout(timer)
+      timer = setTimeout(() => {
+        func(...args)
+      }, timeout)
+    }
+  }
+
   const title = (label: string, key: string) => (
     <div className="center">
       {label}
       {label === quoteId || label === careRecipientName ? (
         <div className="title-input-search">
           <Input
-            value={handleDefault(key)}
+            // value={handleDefault(key)}
             style={{ width: 'auto' }}
-            onChange={e => handleFilter({ [key]: e.target.value.trim() })}
+            onChange={debounce(e =>
+              handleFilter({ [key]: e.target.value.trim() })
+            )}
           />
         </div>
       ) : (
