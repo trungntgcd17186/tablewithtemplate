@@ -1,6 +1,7 @@
 import { uuid } from '@utils/webHelper'
 import { SettingOutlined, UserOutlined, TableOutlined } from '@ant-design/icons'
 import Table from '@pages/Table'
+import Users from '../pages/Users/Users'
 import Home from '@pages/Home'
 
 export type RouteProps = {
@@ -35,18 +36,21 @@ export let routes = [
   },
   {
     key: uuid(),
+    title: 'Users',
+    Icon: UserOutlined,
+    url: '/usermanage',
+    exact: true,
+    Component: Users,
+  },
+  {
+    key: uuid(),
     title: 'Home',
     Icon: UserOutlined,
     url: '/Home',
     exact: true,
     Component: Home,
   },
-  {
-    key: uuid(),
-    title: '用户管理',
-    url: '/users',
-    Icon: SettingOutlined,
-  },
+
   {
     key: uuid(),
     title: '订单管理',

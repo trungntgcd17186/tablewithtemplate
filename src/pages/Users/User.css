@@ -1,0 +1,61 @@
+.ant-layout-content {
+  background-color: #eaeef3;
+
+  padding: 50px;
+}
+
+.layout-header {
+  height: 45px;
+
+  background-color: #ffffff;
+  border-bottom: 1px dotted rgba(0, 0, 0, 0.2);
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.layout-content {
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  background-color: #ffffff;
+  padding: 10px 20px 10px 20px;
+}
+
+.ant-table {
+  margin-top: 10px;
+}
+
+.btn-add-new {
+  width: 100px;
+  background-color: #6777ef;
+  border: 1px solid #6777ef;
+  color: #fff;
+  padding: 10px 14px 10px;
+  height: 40px;
+  font-size: 12px;
+  font-weight: bold;
+  /* margin-top: -40px; */
+}
+
+.action-container {
+  display: flex;
+}
+
+.action-edit {
+  width: 28px;
+  height: 28px;
+  background-color: #ccffce;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 6px;
+}
+.action-delete {
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  background-color: #ffdacc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 7px;
+}
