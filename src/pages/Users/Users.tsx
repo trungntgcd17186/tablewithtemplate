@@ -14,6 +14,7 @@ export const dataColumns = [
     website: 'hildegard.org',
     company: 'Romaguera-Crona',
     role: 'member',
+    avatar: '',
   },
 ]
 

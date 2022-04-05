@@ -6,7 +6,7 @@ export default function AddUser() {
   const storageKey = 'UserList'
   const onFinish = (values: any) => {
     dataColumns.push(values)
-    console.log(dataColumns)
+
     localStorage.setItem(storageKey, JSON.stringify(dataColumns))
   }
 
@@ -103,6 +103,15 @@ export default function AddUser() {
               <Button type="ghost" style={{ marginLeft: '10px' }}>
                 Cancel
               </Button>
+            </Form.Item>
+
+            <Form.Item
+              label="Avatar"
+              name="avatar"
+              rules={[
+                { required: true, message: 'Please input your avatar link!' },
+              ]}>
+              <Input />
             </Form.Item>
           </Form>
         </div>
