@@ -1,19 +1,43 @@
-import { objType } from '@lib/types'
-import { Col, Layout, Row, Table, Button, Select } from 'antd'
+import { DeleteFilled, EditFilled } from '@ant-design/icons'
+import { Button, Col, Layout, Row, Select, Table } from 'antd'
 import React, { useState } from 'react'
-import { useDatas } from './queries'
-import { EditFilled } from '@ant-design/icons'
-import { DeleteFilled } from '@ant-design/icons'
 import './User.css'
+export const dataColumns = [
+  {
+    id: 1,
+    name: 'Leanne Graham',
+    username: 'Bret',
+    email: 'Sincere@april.biz',
+    address: {
+      street: 'Kulas Light',
+      suite: 'Apt. 556',
+      city: 'Gwenborough',
+      zipcode: '92998-3874',
+      geo: {
+        lat: '-37.3159',
+        lng: '81.1496',
+      },
+    },
+    phone: '1-770-736-8031 x56442',
+    website: 'hildegard.org',
+    company: {
+      name: 'Romaguera-Crona',
+      catchPhrase: 'Multi-layered client-server neural-net',
+      bs: 'harness real-time e-markets',
+    },
+  },
+]
+
+const { Option } = Select
 
 export default function Users() {
-  const [filter, setFilter] = useState<objType>({ _page: 1 })
+  const storageKey = 'UserList'
 
-  const { data, isFetching, refetch } = useDatas({
-    variables: filter,
-  })
+  localStorage.setItem(storageKey, JSON.stringify(dataColumns))
 
-  const { Option } = Select
+  const dataString = localStorage.getItem(storageKey)
+
+  const [users, setUsers] = useState<any>(JSON.parse(dataString || '') || [])
 
   const columns = [
     {
@@ -94,7 +118,7 @@ export default function Users() {
             entries
           </p>
           <Col>
-            <Table dataSource={data} columns={columns} />
+            <Table dataSource={users} columns={columns} />
           </Col>
         </Row>
       </Layout>
