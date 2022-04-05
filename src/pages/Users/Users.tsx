@@ -1,6 +1,7 @@
 import { DeleteFilled, EditFilled } from '@ant-design/icons'
 import { Button, Col, Layout, Row, Select, Table } from 'antd'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import './User.css'
 export const dataColumns = [
   {
@@ -8,23 +9,11 @@ export const dataColumns = [
     name: 'Leanne Graham',
     username: 'Bret',
     email: 'Sincere@april.biz',
-    address: {
-      street: 'Kulas Light',
-      suite: 'Apt. 556',
-      city: 'Gwenborough',
-      zipcode: '92998-3874',
-      geo: {
-        lat: '-37.3159',
-        lng: '81.1496',
-      },
-    },
-    phone: '1-770-736-8031 x56442',
+    address: 'Kulas Knight',
+    phoneNumber: '1-770-736-8031 x56442',
     website: 'hildegard.org',
-    company: {
-      name: 'Romaguera-Crona',
-      catchPhrase: 'Multi-layered client-server neural-net',
-      bs: 'harness real-time e-markets',
-    },
+    company: 'Romaguera-Crona',
+    role: 'member',
   },
 ]
 
@@ -69,11 +58,11 @@ export default function Users() {
     },
     {
       title: 'Address',
-      dataIndex: ['address', 'street'],
+      dataIndex: 'address',
     },
     {
       title: 'Phone Number',
-      dataIndex: 'phone',
+      dataIndex: 'phoneNumber',
     },
     {
       title: 'Website',
@@ -81,11 +70,11 @@ export default function Users() {
     },
     {
       title: 'Company',
-      dataIndex: ['company', 'name'],
+      dataIndex: 'company',
     },
     {
       title: 'Role',
-      dataIndex: '',
+      dataIndex: 'role',
     },
     {
       title: 'Action',
@@ -108,7 +97,9 @@ export default function Users() {
       <Layout className="layout-header"></Layout>
       <Layout className="layout-content">
         <Row style={{ display: 'flex', flexDirection: 'column' }}>
-          <Button className="btn-add-new">Add New +</Button>
+          <Link to="/adduser">
+            <Button className="btn-add-new">Add New +</Button>
+          </Link>
 
           <p style={{ marginTop: '10px', fontSize: '16px' }}>
             Show{' '}

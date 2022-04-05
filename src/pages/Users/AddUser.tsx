@@ -1,13 +1,13 @@
 import { Form, Select, Input, Button } from 'antd'
-import dataColumns from './Users'
+import { dataColumns } from './Users'
 const { Option } = Select
 
 export default function AddUser() {
-  console.log(dataColumns)
   const storageKey = 'UserList'
   const onFinish = (values: any) => {
-    // data.push(values)
-    console.log(values)
+    dataColumns.push(values)
+    console.log(dataColumns)
+    localStorage.setItem(storageKey, JSON.stringify(dataColumns))
   }
 
   const onFinishFailed = (errorInfo: any) => {
@@ -30,19 +30,17 @@ export default function AddUser() {
             onFinishFailed={onFinishFailed}
             autoComplete="off">
             <Form.Item
-              label="First Name"
-              name="firstName"
-              rules={[
-                { required: true, message: 'Please input your first name!' },
-              ]}>
+              label="Name"
+              name="name"
+              rules={[{ required: true, message: 'Please input your name!' }]}>
               <Input />
             </Form.Item>
 
             <Form.Item
-              label="Last Name"
-              name="lastName"
+              label="Username"
+              name="username"
               rules={[
-                { required: true, message: 'Please input your last name!' },
+                { required: true, message: 'Please input your username!' },
               ]}>
               <Input />
             </Form.Item>
