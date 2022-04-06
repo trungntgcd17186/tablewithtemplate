@@ -96,15 +96,6 @@ export default function AddUser() {
               </Select>
             </Form.Item>
 
-            <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-              <Button type="primary" htmlType="submit">
-                Submit
-              </Button>
-              <Button type="ghost" style={{ marginLeft: '10px' }}>
-                Cancel
-              </Button>
-            </Form.Item>
-
             <Form.Item
               label="Avatar"
               name="avatar"
@@ -112,6 +103,15 @@ export default function AddUser() {
                 { required: true, message: 'Please input your avatar link!' },
               ]}>
               <Input />
+            </Form.Item>
+
+            <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+              <Button type="primary" htmlType="submit">
+                Submit
+              </Button>
+              <Button type="ghost" style={{ marginLeft: '10px' }}>
+                Cancel
+              </Button>
             </Form.Item>
           </Form>
         </div>
