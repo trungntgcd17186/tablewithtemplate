@@ -16,10 +16,11 @@ function SiderComponent(props: Props) {
     }
   }
 
-  const renderMenuItem = (route: RouteProps) => {
+  const renderMenuItem = (route: RouteProps, index: string) => {
     return (
       <Menu.Item
         key={route.key}
+        id={'MenuItem' + index}
         disabled={route.disabled}
         icon={route.Icon ? <route.Icon /> : null}
         onClick={handleTo(route.url)}>
@@ -42,13 +43,15 @@ function SiderComponent(props: Props) {
       <Menu theme="dark" mode="inline">
         {routes.map(route =>
           !route.children ? (
-            renderMenuItem(route)
+            renderMenuItem(route, '')
           ) : (
             <Menu.SubMenu
               key={route.key}
               icon={<route.Icon />}
               title={route.title}>
-              {route.children.map(c => renderMenuItem(c))}
+              {route.children.map((c, index) =>
+                renderMenuItem(c, index.toString())
+              )}
             </Menu.SubMenu>
           )
         )}

@@ -1,18 +1,36 @@
-import { Form, Select, Input, Button } from 'antd'
-import { dataColumns } from './Users'
+import { Form, Select, Input, Button, notification } from 'antd'
+import history from '@utils/history'
 const { Option } = Select
 
 export default function AddUser() {
   const storageKey = 'UserList'
   const onFinish = (values: any) => {
-    dataColumns.push(values)
+    let oldItems = JSON.parse(localStorage.getItem(storageKey) || '[]') || []
 
-    localStorage.setItem(storageKey, JSON.stringify(dataColumns))
+    oldItems.push({ ...values, id: oldItems.length + 1 })
+    localStorage.setItem(storageKey, JSON.stringify(oldItems))
+    notification.open({
+      message: 'Notification Add User',
+      description: 'New user successfully added',
+    })
+    history.push('/totalusers')
+
+    document
+      .getElementById('MenuItem1')
+      ?.classList.remove('ant-menu-item-selected')
+    document
+      .getElementById('MenuItem0')
+      ?.classList.add('ant-menu-item-selected')
   }
 
   const onFinishFailed = (errorInfo: any) => {
     console.log(errorInfo)
+    notification.open({
+      message: 'Notification Add User',
+      description: 'Add failed',
+    })
   }
+
   return (
     <div>
       <h1>Add User</h1>
@@ -32,7 +50,7 @@ export default function AddUser() {
             <Form.Item
               label="Name"
               name="name"
-              rules={[{ required: true, message: 'Please input your name!' }]}>
+              rules={[{ required: true, message: 'Please input user name!' }]}>
               <Input />
             </Form.Item>
 
@@ -40,7 +58,7 @@ export default function AddUser() {
               label="Username"
               name="username"
               rules={[
-                { required: true, message: 'Please input your username!' },
+                { required: true, message: 'Please input user username!' },
               ]}>
               <Input />
             </Form.Item>
@@ -48,7 +66,16 @@ export default function AddUser() {
             <Form.Item
               label="Email"
               name="email"
-              rules={[{ required: true, message: 'Please input your email!' }]}>
+              rules={[
+                {
+                  required: true,
+                  message: 'Please input user email!',
+                },
+                {
+                  type: 'email',
+                  message: 'The input is not valid E-mail!',
+                },
+              ]}>
               <Input />
             </Form.Item>
 
@@ -56,7 +83,7 @@ export default function AddUser() {
               label="Address"
               name="address"
               rules={[
-                { required: true, message: 'Please input your address!' },
+                { required: true, message: 'Please input user address!' },
               ]}>
               <Input />
             </Form.Item>
@@ -64,45 +91,41 @@ export default function AddUser() {
             <Form.Item
               label="Phone Number"
               name="phoneNumber"
-              rules={[{ required: true, message: 'Please input your email!' }]}>
-              <Input />
-            </Form.Item>
-
-            <Form.Item
-              label="Website"
-              name="website"
               rules={[
-                { required: true, message: 'Please input your website!' },
+                {
+                  required: true,
+                  message: 'Please input user phone number!',
+                },
+                {
+                  pattern: new RegExp(
+                    /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im
+                  ),
+                  message: 'Wrong format!',
+                },
               ]}>
               <Input />
             </Form.Item>
 
-            <Form.Item
-              label="Company"
-              name="company"
-              rules={[
-                { required: true, message: 'Please input your company!' },
-              ]}>
+            <Form.Item label="Website" name="website">
+              <Input />
+            </Form.Item>
+
+            <Form.Item label="Company" name="company">
               <Input />
             </Form.Item>
 
             <Form.Item
               label="Role"
               name="role"
-              rules={[{ required: true, message: 'Please input your role!' }]}>
+              rules={[{ required: true, message: 'Please input user role!' }]}>
               <Select placeholder="Member">
                 <Option value="admin">Admin</Option>
                 <Option value="member">Member</Option>
               </Select>
             </Form.Item>
 
-            <Form.Item
-              label="Avatar"
-              name="avatar"
-              rules={[
-                { required: true, message: 'Please input your avatar link!' },
-              ]}>
-              <Input />
+            <Form.Item label="Avatar" name="avatar">
+              <Input type="file" />
             </Form.Item>
 
             <Form.Item wrapperCol={{ offset: 8, span: 16 }}>

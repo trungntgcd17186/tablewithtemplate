@@ -2,6 +2,7 @@ import { DeleteFilled, EditFilled } from '@ant-design/icons'
 import { Button, Col, Layout, Row, Select, Table } from 'antd'
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { uuid } from '@utils/webHelper'
 import './User.css'
 export const dataColumns = [
   {
@@ -23,13 +24,24 @@ const { Option } = Select
 export default function Users() {
   const storageKey = 'UserList'
 
-  localStorage.setItem(storageKey, JSON.stringify(dataColumns))
-
   const dataString = localStorage.getItem(storageKey)
 
-  const [users, setUsers] = useState<any>(JSON.parse(dataString || '') || [])
+  const [users, setUsers] = useState<any>([])
+
+  useEffect(() => {
+    if (dataString) {
+      setUsers(JSON.parse(dataString || '[]'))
+    } else {
+      setUsers(dataColumns)
+      localStorage.setItem(storageKey, JSON.stringify(dataColumns))
+    }
+  }, [dataColumns])
 
   const columns = [
+    {
+      title: 'ID',
+      dataIndex: 'id',
+    },
     {
       title: 'Avatar',
       dataIndex: '',
@@ -79,19 +91,42 @@ export default function Users() {
     },
     {
       title: 'Action',
-      dataIndex: '',
-      render: () => (
+      dataIndex: 'id',
+      render: (id: string) => (
         <div className="action-container">
-          <div className="action-edit">
+          <Button className="action-edit">
             <EditFilled style={{ color: '#4caf50' }} />
-          </div>
-          <div className="action-delete">
+          </Button>
+          <Button className="action-delete" id={id} onClick={handleDelete}>
             <DeleteFilled style={{ color: 'orange' }} />
-          </div>
+          </Button>
         </div>
       ),
     },
   ]
+
+  const handleDelete = (e: any) => {
+    let items = JSON.parse(dataString || '[]')
+
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].id == e.target.id) {
+        items.splice(i, 1)
+      }
+    }
+
+    items = JSON.stringify(items)
+
+    localStorage.setItem(storageKey, items)
+  }
+
+  const handleClickAddNew = () => {
+    document
+      .getElementById('MenuItem0')
+      ?.classList.remove('ant-menu-item-selected')
+    document
+      .getElementById('MenuItem1')
+      ?.classList.add('ant-menu-item-selected')
+  }
 
   return (
     <>
@@ -99,7 +134,9 @@ export default function Users() {
       <Layout className="layout-content">
         <Row style={{ display: 'flex', flexDirection: 'column' }}>
           <Link to="/adduser">
-            <Button className="btn-add-new">Add New +</Button>
+            <Button onClick={handleClickAddNew} className="btn-add-new">
+              Add New +
+            </Button>
           </Link>
 
           <p style={{ marginTop: '10px', fontSize: '16px' }}>
