@@ -4,6 +4,7 @@ import Table from '@pages/Table'
 import Users from '@pages/Users/Users'
 import Home from '@pages/Home'
 import AddUser from '@pages/Users/AddUser'
+import EditUser from '@pages/Users/EditUser'
 
 export type RouteProps = {
   key: string
@@ -53,6 +54,12 @@ export let routes = [
         title: 'Add User',
         url: '/adduser',
         Component: AddUser,
+      },
+      {
+        key: uuid(),
+        title: 'Edit User',
+        url: '/edituser',
+        Component: EditUser,
       },
     ],
   },

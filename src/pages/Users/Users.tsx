@@ -1,8 +1,7 @@
 import { DeleteFilled, EditFilled } from '@ant-design/icons'
 import { Button, Col, Layout, Row, Select, Table } from 'antd'
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { uuid } from '@utils/webHelper'
 import './User.css'
 export const dataColumns = [
   {
@@ -28,14 +27,16 @@ export default function Users() {
 
   const [users, setUsers] = useState<any>([])
 
+  const dataLS = JSON.parse(dataString || '[]')
+
   useEffect(() => {
     if (dataString) {
-      setUsers(JSON.parse(dataString || '[]'))
+      setUsers(dataLS)
     } else {
       setUsers(dataColumns)
       localStorage.setItem(storageKey, JSON.stringify(dataColumns))
     }
-  }, [dataColumns])
+  }, [dataString])
 
   const columns = [
     {
@@ -45,14 +46,17 @@ export default function Users() {
     {
       title: 'Avatar',
       dataIndex: '',
-      render: (id: string) => (
+      render: (objectUserInfor: { avatar: string }) => (
         <img
           style={{
             width: '50px',
             height: '50px',
             borderRadius: '50%',
           }}
-          src="https://www.thecastofcheers.com/images/9-best-online-avatars-and-how-to-make-your-own-[2020]-4.png"
+          src={
+            objectUserInfor.avatar ||
+            'https://www.thecastofcheers.com/images/9-best-online-avatars-and-how-to-make-your-own-[2020]-4.png'
+          }
           alt="anh avatar"
         />
       ),
@@ -115,8 +119,9 @@ export default function Users() {
     }
 
     items = JSON.stringify(items)
-
     localStorage.setItem(storageKey, items)
+
+    setUsers(JSON.parse(dataString || '[]'))
   }
 
   const handleClickAddNew = () => {

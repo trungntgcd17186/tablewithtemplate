@@ -1,24 +1,9 @@
-import { Form, Select, Input, Button, notification, Upload } from 'antd'
-import history from '@utils/history'
-import { useState } from 'react'
+import React from 'react'
+import { Form, Select, Input, Button, notification } from 'antd'
 const { Option } = Select
 
-export default function AddUser() {
-  const [baseImage, setBaseImage] = useState('')
-
-  const storageKey = 'UserList'
-
+export default function EditUser() {
   const onFinish = (values: any) => {
-    let oldItems = JSON.parse(localStorage.getItem(storageKey) || '[]') || []
-
-    oldItems.push({ ...values, id: oldItems.length + 1, avatar: baseImage })
-    localStorage.setItem(storageKey, JSON.stringify(oldItems))
-    notification.open({
-      message: 'Notification Add User',
-      description: 'New user successfully added',
-    })
-    history.push('/totalusers')
-
     document
       .getElementById('MenuItem1')
       ?.classList.remove('ant-menu-item-selected')
@@ -34,38 +19,9 @@ export default function AddUser() {
       description: 'Add failed',
     })
   }
-
-  const uploadImage = async (e: any) => {
-    const file = e.target.files[0]
-    const base64: any = await convertBase64(file)
-    setBaseImage(base64)
-  }
-
-  const convertBase64 = (file: any) => {
-    if (file.size <= 102400) {
-      return new Promise((resolve, reject) => {
-        const fileReader = new FileReader()
-        fileReader.readAsDataURL(file)
-
-        fileReader.onload = () => {
-          resolve(fileReader.result)
-        }
-
-        fileReader.onerror = error => {
-          reject(error)
-        }
-      })
-    } else {
-      notification.open({
-        message: 'Notification Image Upload',
-        description: 'Size Image too big >100KB',
-      })
-    }
-  }
-
   return (
     <div>
-      <h1>Add User</h1>
+      <h1>Edit User</h1>
       <div className="container-add-user">
         <div className="card-head">
           <h1>Basic Information</h1>
@@ -157,14 +113,7 @@ export default function AddUser() {
             </Form.Item>
 
             <Form.Item label="Avatar" name="avatar">
-              <Input
-                type="file"
-                onChange={e => {
-                  uploadImage(e)
-                }}
-              />
-              <Upload></Upload>
-              <img src={baseImage} style={{ height: '200px' }} />
+              <Input type="file" />
             </Form.Item>
 
             <Form.Item
