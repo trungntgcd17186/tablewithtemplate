@@ -1,9 +1,39 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Form, Select, Input, Button, notification } from 'antd'
+import { Link } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
+import dataColumns from './Users'
 const { Option } = Select
 
-export default function EditUser() {
+interface IProps {
+  setUsers: any
+}
+export default function EditUser({ setUsers, ...props }: IProps) {
+  let history = useHistory()
+  const [baseImage, setBaseImage] = useState('')
+
+  const dataEdit = JSON.parse(localStorage.getItem('dataEdit') || '[]')
+  const storageKey = 'UserList'
+  const dataString = localStorage.getItem(storageKey)
+  const dataLS = JSON.parse(dataString || '[]')
+
   const onFinish = (values: any) => {
+    //Xử lý submit sau khi edit
+    let items = JSON.parse(dataString || '[]')
+    for (let i = 0; i < items.length; i++) {
+      //Tìm id user cần edit theo id columns
+      if (items[i].id == dataEdit.id) {
+        const objectSubmit = { ...values, avatar: baseImage, id: dataEdit.id }
+        //Chạy vòng for đến vị trí id cần edit sau đó gán bằng object mới lấy từ form submit, push lại id từ lS, thêm lại avatar nếu người dùng upload ảnh.
+        items[i] = { ...objectSubmit }
+      }
+    }
+
+    items = JSON.stringify(items)
+    localStorage.setItem(storageKey, items)
+
+    window.location.href = 'http://localhost:3000/totalusers'
+
     document
       .getElementById('MenuItem1')
       ?.classList.remove('ant-menu-item-selected')
@@ -16,9 +46,48 @@ export default function EditUser() {
     console.log(errorInfo)
     notification.open({
       message: 'Notification Add User',
-      description: 'Add failed',
+      description: 'Edit failed',
     })
   }
+
+  const uploadImage = async (e: any) => {
+    const file = e.target.files[0]
+    const base64: any = await convertBase64(file)
+    setBaseImage(base64)
+  }
+
+  const convertBase64 = (file: any) => {
+    if (file.size <= 102400) {
+      return new Promise((resolve, reject) => {
+        const fileReader = new FileReader()
+        fileReader.readAsDataURL(file)
+
+        fileReader.onload = () => {
+          resolve(fileReader.result)
+        }
+
+        fileReader.onerror = error => {
+          reject(error)
+        }
+      })
+    } else {
+      notification.open({
+        message: 'Notification Image Upload',
+        description: 'Size Image too big >100KB',
+      })
+    }
+  }
+
+  const handleClickCancel = () => {
+    //Xử lý đổi màu sidebar
+    document
+      .getElementById('MenuItem2')
+      ?.classList.remove('ant-menu-item-selected')
+    document
+      .getElementById('MenuItem0')
+      ?.classList.add('ant-menu-item-selected')
+  }
+
   return (
     <div>
       <h1>Edit User</h1>
@@ -31,7 +100,16 @@ export default function EditUser() {
             name="basic"
             labelCol={{ span: 3 }}
             wrapperCol={{ span: 32 }}
-            initialValues={{ remember: true }}
+            initialValues={{
+              name: dataEdit.name,
+              username: dataEdit.username,
+              email: dataEdit.email,
+              address: dataEdit.address,
+              phoneNumber: dataEdit.phoneNumber,
+              website: dataEdit.website,
+              company: dataEdit.company,
+              role: dataEdit.role,
+            }}
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}
             autoComplete="off">
@@ -41,7 +119,6 @@ export default function EditUser() {
               rules={[{ required: true, message: 'Please input user name!' }]}>
               <Input />
             </Form.Item>
-
             <Form.Item
               label="Username"
               name="username"
@@ -113,7 +190,13 @@ export default function EditUser() {
             </Form.Item>
 
             <Form.Item label="Avatar" name="avatar">
-              <Input type="file" />
+              <Input
+                type="file"
+                onChange={e => {
+                  uploadImage(e)
+                }}
+              />
+              <img src={baseImage} style={{ height: '100px' }} />
             </Form.Item>
 
             <Form.Item
@@ -122,9 +205,15 @@ export default function EditUser() {
               <Button type="primary" htmlType="submit">
                 Submit
               </Button>
-              <Button type="ghost" style={{ marginLeft: '10px' }}>
-                Cancel
-              </Button>
+
+              <Link to="/totalusers">
+                <Button
+                  onClick={handleClickCancel}
+                  type="ghost"
+                  style={{ marginLeft: '10px' }}>
+                  Cancel
+                </Button>
+              </Link>
             </Form.Item>
           </Form>
         </div>

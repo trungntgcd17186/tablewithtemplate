@@ -1,11 +1,13 @@
 import { DeleteFilled, EditFilled } from '@ant-design/icons'
-import { Button, Col, Layout, Row, Select, Table } from 'antd'
+import { uuid } from '@utils/webHelper'
+import { Button, Col, Layout, Row, Select, Table, Tag } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import EditUser from './EditUser'
 import './User.css'
 export const dataColumns = [
   {
-    id: 1,
+    id: uuid(),
     name: 'Leanne Graham',
     username: 'Bret',
     email: 'Sincere@april.biz',
@@ -25,7 +27,7 @@ export default function Users() {
 
   const dataString = localStorage.getItem(storageKey)
 
-  const [users, setUsers] = useState<any>([])
+  const [users, setUsers] = useState<any[]>([])
 
   const dataLS = JSON.parse(dataString || '[]')
 
@@ -98,22 +100,25 @@ export default function Users() {
       dataIndex: 'id',
       render: (id: string) => (
         <div className="action-container">
-          <Button className="action-edit">
-            <EditFilled style={{ color: '#4caf50' }} />
-          </Button>
-          <Button className="action-delete" id={id} onClick={handleDelete}>
+          <Link to="/edituser">
+            <Tag className="action-edit" onClick={() => handleEdit(id)}>
+              <EditFilled style={{ color: '#4caf50' }} />
+            </Tag>
+          </Link>
+
+          <Tag className="action-delete" onClick={() => handleDelete(id)}>
             <DeleteFilled style={{ color: 'orange' }} />
-          </Button>
+          </Tag>
         </div>
       ),
     },
   ]
 
-  const handleDelete = (e: any) => {
+  const handleDelete = (id: number | string) => {
     let items = JSON.parse(dataString || '[]')
 
     for (let i = 0; i < items.length; i++) {
-      if (items[i].id == e.target.id) {
+      if (items[i].id == id) {
         items.splice(i, 1)
       }
     }
@@ -121,7 +126,28 @@ export default function Users() {
     items = JSON.stringify(items)
     localStorage.setItem(storageKey, items)
 
-    setUsers(JSON.parse(dataString || '[]'))
+    setUsers(dataLS)
+  }
+
+  const handleEdit = (id: number | string) => {
+    let items = JSON.parse(dataString || '[]')
+    let objInforUser: any
+
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].id == id) {
+        objInforUser = items[i]
+      }
+    }
+
+    localStorage.setItem('dataEdit', JSON.stringify(objInforUser))
+
+    //Xử lý đổi màu sidebar
+    document
+      .getElementById('MenuItem0')
+      ?.classList.remove('ant-menu-item-selected')
+    document
+      .getElementById('MenuItem2')
+      ?.classList.add('ant-menu-item-selected')
   }
 
   const handleClickAddNew = () => {

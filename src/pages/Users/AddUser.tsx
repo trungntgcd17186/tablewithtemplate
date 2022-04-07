@@ -1,8 +1,10 @@
 import { Form, Select, Input, Button, notification, Upload } from 'antd'
 import history from '@utils/history'
 import { useState } from 'react'
-const { Option } = Select
+import { uuid } from '@utils/webHelper'
+import { Link } from 'react-router-dom'
 
+const { Option } = Select
 export default function AddUser() {
   const [baseImage, setBaseImage] = useState('')
 
@@ -11,7 +13,7 @@ export default function AddUser() {
   const onFinish = (values: any) => {
     let oldItems = JSON.parse(localStorage.getItem(storageKey) || '[]') || []
 
-    oldItems.push({ ...values, id: oldItems.length + 1, avatar: baseImage })
+    oldItems.push({ ...values, id: uuid(), avatar: baseImage })
     localStorage.setItem(storageKey, JSON.stringify(oldItems))
     notification.open({
       message: 'Notification Add User',
@@ -63,6 +65,15 @@ export default function AddUser() {
     }
   }
 
+  const handleClickCancel = () => {
+    //Xử lý đổi màu sidebar
+    document
+      .getElementById('MenuItem1')
+      ?.classList.remove('ant-menu-item-selected')
+    document
+      .getElementById('MenuItem0')
+      ?.classList.add('ant-menu-item-selected')
+  }
   return (
     <div>
       <h1>Add User</h1>
@@ -163,8 +174,7 @@ export default function AddUser() {
                   uploadImage(e)
                 }}
               />
-              <Upload></Upload>
-              <img src={baseImage} style={{ height: '200px' }} />
+              <img src={baseImage} style={{ height: '100px' }} />
             </Form.Item>
 
             <Form.Item
@@ -173,9 +183,15 @@ export default function AddUser() {
               <Button type="primary" htmlType="submit">
                 Submit
               </Button>
-              <Button type="ghost" style={{ marginLeft: '10px' }}>
-                Cancel
-              </Button>
+
+              <Link to="/totalusers">
+                <Button
+                  onClick={handleClickCancel}
+                  type="ghost"
+                  style={{ marginLeft: '10px' }}>
+                  Cancel
+                </Button>
+              </Link>
             </Form.Item>
           </Form>
         </div>
