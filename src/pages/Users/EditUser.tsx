@@ -8,14 +8,16 @@ const { Option } = Select
 interface IProps {
   setUsers: any
 }
-export default function EditUser({ setUsers, ...props }: IProps) {
+export default function EditUser(props: IProps) {
+  const { setUsers } = props
+  console.log(props)
+
   let history = useHistory()
   const [baseImage, setBaseImage] = useState('')
 
   const dataEdit = JSON.parse(localStorage.getItem('dataEdit') || '[]')
   const storageKey = 'UserList'
   const dataString = localStorage.getItem(storageKey)
-  const dataLS = JSON.parse(dataString || '[]')
 
   const onFinish = (values: any) => {
     //Xử lý submit sau khi edit
@@ -32,7 +34,7 @@ export default function EditUser({ setUsers, ...props }: IProps) {
     items = JSON.stringify(items)
     localStorage.setItem(storageKey, items)
 
-    window.location.href = 'http://localhost:3000/totalusers'
+    history.push('/totalusers')
 
     document
       .getElementById('MenuItem1')

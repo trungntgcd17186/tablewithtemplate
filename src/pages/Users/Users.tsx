@@ -12,7 +12,7 @@ export const dataColumns = [
     username: 'Bret',
     email: 'Sincere@april.biz',
     address: 'Kulas Knight',
-    phoneNumber: '1-770-736-8031 x56442',
+    phoneNumber: '0123456789',
     website: 'hildegard.org',
     company: 'Romaguera-Crona',
     role: 'member',
@@ -131,7 +131,7 @@ export default function Users() {
 
   const handleEdit = (id: number | string) => {
     let items = JSON.parse(dataString || '[]')
-    let objInforUser: any
+    let objInforUser = {}
 
     for (let i = 0; i < items.length; i++) {
       if (items[i].id == id) {
@@ -178,7 +178,11 @@ export default function Users() {
             entries
           </p>
           <Col>
-            <Table dataSource={users} columns={columns} />
+            <Table
+              style={{ overflowY: 'hidden', overflowX: 'scroll' }}
+              dataSource={users}
+              columns={columns}
+            />
           </Col>
         </Row>
       </Layout>
