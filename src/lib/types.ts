@@ -69,3 +69,16 @@ export interface objType {
     | React.ChangeEvent<HTMLElement>
     | void
 }
+
+export interface IUsers {
+  id: string
+  name: string
+  username: string
+  email: string
+  address: string
+  phoneNumber: string
+  website: string
+  company: string
+  role: string
+  avatar: string
+}

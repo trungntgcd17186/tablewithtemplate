@@ -1,25 +1,25 @@
-import React, { useEffect, useState } from 'react'
-import { Form, Select, Input, Button, notification } from 'antd'
-import { Link } from 'react-router-dom'
-import { useHistory } from 'react-router-dom'
-import dataColumns from './Users'
+import { Button, Form, Input, notification, Select } from 'antd'
+import React, { useState } from 'react'
+import { Link, useHistory } from 'react-router-dom'
+import { IUsers } from '@lib/types'
 const { Option } = Select
 
-interface IProps {
-  setUsers: any
-}
-export default function EditUser(props: IProps) {
-  const { setUsers } = props
-  console.log(props)
-
+export default function EditUser() {
   let history = useHistory()
   const [baseImage, setBaseImage] = useState('')
+  const [number, setNumber] = useState(0)
 
   const dataEdit = JSON.parse(localStorage.getItem('dataEdit') || '[]')
   const storageKey = 'UserList'
   const dataString = localStorage.getItem(storageKey)
 
-  const onFinish = (values: any) => {
+  const onNumberChange = (e: any) => {
+    if (e.target && e.keyCode >= 48 && e.keyCode <= 57) {
+      e.target.value = ''
+    }
+  }
+
+  const onFinish = (values: IUsers) => {
     //Xử lý submit sau khi edit
     let items = JSON.parse(dataString || '[]')
     for (let i = 0; i < items.length; i++) {
@@ -44,7 +44,7 @@ export default function EditUser(props: IProps) {
       ?.classList.add('ant-menu-item-selected')
   }
 
-  const onFinishFailed = (errorInfo: any) => {
+  const onFinishFailed = (errorInfo: {}) => {
     console.log(errorInfo)
     notification.open({
       message: 'Notification Add User',
@@ -55,10 +55,11 @@ export default function EditUser(props: IProps) {
   const uploadImage = async (e: any) => {
     const file = e.target.files[0]
     const base64: any = await convertBase64(file)
+
     setBaseImage(base64)
   }
 
-  const convertBase64 = (file: any) => {
+  const convertBase64 = (file: Blob) => {
     if (file.size <= 102400) {
       return new Promise((resolve, reject) => {
         const fileReader = new FileReader()
@@ -170,10 +171,28 @@ export default function EditUser(props: IProps) {
                   message: 'Wrong format!',
                 },
               ]}>
-              <Input />
+              <Input
+                // className="number"
+                type="number"
+                onChange={onNumberChange}
+              />
             </Form.Item>
 
-            <Form.Item label="Website" name="website">
+            <Form.Item
+              label="Website"
+              name="website"
+              rules={[
+                {
+                  required: true,
+                  message: 'Please input user phone number!',
+                },
+                {
+                  pattern: new RegExp(
+                    '^(http[s]?:\\/\\/(www\\.)?|ftp:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_+~#=]+)+((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?'
+                  ),
+                  message: 'Wrong format!',
+                },
+              ]}>
               <Input />
             </Form.Item>
 

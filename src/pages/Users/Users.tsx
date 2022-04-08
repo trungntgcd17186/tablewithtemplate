@@ -1,9 +1,9 @@
 import { DeleteFilled, EditFilled } from '@ant-design/icons'
 import { uuid } from '@utils/webHelper'
-import { Button, Col, Layout, Row, Select, Table, Tag } from 'antd'
+import { Button, Col, Layout, Row, Select, Table, Tag, Input } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import EditUser from './EditUser'
+import { IUsers } from '@lib/types'
 import './User.css'
 export const dataColumns = [
   {
@@ -13,7 +13,7 @@ export const dataColumns = [
     email: 'Sincere@april.biz',
     address: 'Kulas Knight',
     phoneNumber: '0123456789',
-    website: 'hildegard.org',
+    website: 'http://hildegard.org',
     company: 'Romaguera-Crona',
     role: 'member',
     avatar: '',
@@ -27,7 +27,8 @@ export default function Users() {
 
   const dataString = localStorage.getItem(storageKey)
 
-  const [users, setUsers] = useState<any[]>([])
+  const [users, setUsers] = useState<IUsers[]>([])
+  const [filter, setFilter] = useState<any>({ _page: 1 })
 
   const dataLS = JSON.parse(dataString || '[]')
 
@@ -159,6 +160,24 @@ export default function Users() {
       ?.classList.add('ant-menu-item-selected')
   }
 
+  const handleFilter = (e: string) => {
+    let items = JSON.parse(dataString || '[]')
+    let arrInforUser = []
+
+    for (let i = 0; i < items.length; i++) {
+      if (Object.values(items[i]).includes(e)) {
+        console.log(items[i])
+
+        arrInforUser.push(items[i])
+        console.log(arrInforUser)
+
+        return setUsers(arrInforUser)
+      } else {
+        return setUsers(dataLS)
+      }
+    }
+  }
+
   return (
     <>
       <Layout className="layout-header"></Layout>
@@ -178,6 +197,10 @@ export default function Users() {
             entries
           </p>
           <Col>
+            <label style={{ width: '30%', float: 'right' }}>
+              Search by user's name:
+              <Input onChange={e => handleFilter(e.target.value.trim())} />
+            </label>
             <Table
               style={{ overflowY: 'hidden', overflowX: 'scroll' }}
               dataSource={users}

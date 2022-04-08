@@ -24,3 +24,16 @@ declare global {
     }
   }
 }
+
+interface IUsers {
+  id: string
+  name: string
+  username: string
+  email: string
+  address: string
+  phoneNumber: string
+  website: string
+  company: string
+  role: string
+  avatar: string
+}
