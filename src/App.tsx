@@ -42,7 +42,7 @@ function App() {
   return (
     <ErrorBoundary>
       <Layout>
-        <Sider />
+        <Sider routeKey={''} />
         <Layout className="ml-200">
           <Layout.Content>
             <Suspense fallback={<Loading />}>

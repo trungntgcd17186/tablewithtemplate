@@ -1,14 +1,21 @@
+import { RouteProps, routes } from '@lib/routes'
+import { publicUrl } from '@utils/env'
 import { Layout, Menu } from 'antd'
 import { SiderProps } from 'antd/lib/layout/Sider'
-import { useHistory } from 'react-router-dom'
+import { useState, useContext } from 'react'
+import { useHistory, useLocation } from 'react-router-dom'
 import styled, { keyframes } from 'styled-components'
-import { publicUrl } from '@utils/env'
-import { routes, RouteProps } from '@lib/routes'
+import RouteKeyContext from '../../pages/Users/Users'
 
-interface Props extends SiderProps {}
-
+interface Props extends SiderProps {
+  routeKey: any
+}
 function SiderComponent(props: Props) {
   const history = useHistory()
+  const location = useLocation()
+
+  const { routeKey } = props
+  // const keyActive = useContext(RouteKeyContext)
 
   const handleTo = (pathname?: string) => () => {
     if (pathname) {
@@ -16,11 +23,12 @@ function SiderComponent(props: Props) {
     }
   }
 
+  const [active, setActive] = useState('')
   const renderMenuItem = (route: RouteProps, index: string) => {
+    // setActive(route.key)
     return (
       <Menu.Item
         key={route.key}
-        id={'MenuItem' + index}
         disabled={route.disabled}
         icon={route.Icon ? <route.Icon /> : null}
         onClick={handleTo(route.url)}>
@@ -40,7 +48,7 @@ function SiderComponent(props: Props) {
         />
         <div className="text-white font-medium">CRA antd admin</div>
       </Logo>
-      <Menu theme="dark" mode="inline">
+      <Menu theme="dark" mode="inline" selectedKeys={[location.pathname]}>
         {routes.map(route =>
           !route.children ? (
             renderMenuItem(route, '')

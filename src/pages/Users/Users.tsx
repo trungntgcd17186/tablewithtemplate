@@ -2,9 +2,19 @@ import { DeleteFilled, EditFilled } from '@ant-design/icons'
 import { uuid } from '@utils/webHelper'
 import { Button, Col, Layout, Row, Select, Table, Tag, Input } from 'antd'
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 import { IUsers } from '@lib/types'
 import './User.css'
+import { routes } from '@lib/routes'
+import SiderComponent from '../../components/ui/Sider'
+import { createContext } from 'react'
+
+interface AppContextInterface {
+  routeKey: string
+}
+
+export const RouteKeyContext = createContext<AppContextInterface | null>(null)
+
 export const dataColumns = [
   {
     id: uuid(),
@@ -23,6 +33,7 @@ export const dataColumns = [
 const { Option } = Select
 
 export default function Users() {
+  let history = useHistory()
   const storageKey = 'UserList'
 
   const dataString = localStorage.getItem(storageKey)
@@ -141,23 +152,18 @@ export default function Users() {
     }
 
     localStorage.setItem('dataEdit', JSON.stringify(objInforUser))
-
-    //Xử lý đổi màu sidebar
-    document
-      .getElementById('MenuItem0')
-      ?.classList.remove('ant-menu-item-selected')
-    document
-      .getElementById('MenuItem2')
-      ?.classList.add('ant-menu-item-selected')
   }
 
+  const [routeKey, setRouteKey] = useState<AppContextInterface | null>(null)
+
   const handleClickAddNew = () => {
-    document
-      .getElementById('MenuItem0')
-      ?.classList.remove('ant-menu-item-selected')
-    document
-      .getElementById('MenuItem1')
-      ?.classList.add('ant-menu-item-selected')
+    const routeUsers: any = routes.filter(el => el.title === 'Users')
+
+    const routeChildren = routeUsers[0].children.filter(
+      (el: any) => el.title === 'Add User'
+    )
+    setRouteKey(routeChildren[0].key)
+    history.push('/adduser')
   }
 
   const handleFilter = (e: string) => {
@@ -169,7 +175,6 @@ export default function Users() {
         console.log(items[i])
 
         arrInforUser.push(items[i])
-        console.log(arrInforUser)
 
         return setUsers(arrInforUser)
       } else {
@@ -180,35 +185,36 @@ export default function Users() {
 
   return (
     <>
-      <Layout className="layout-header"></Layout>
-      <Layout className="layout-content">
-        <Row style={{ display: 'flex', flexDirection: 'column' }}>
-          <Link to="/adduser">
+      <RouteKeyContext.Provider value={routeKey}>
+        <Layout className="layout-header"></Layout>
+        <Layout className="layout-content">
+          <Row style={{ display: 'flex', flexDirection: 'column' }}>
             <Button onClick={handleClickAddNew} className="btn-add-new">
               Add New +
             </Button>
-          </Link>
 
-          <p style={{ marginTop: '10px', fontSize: '16px' }}>
-            Show{' '}
-            <Select defaultValue="10">
-              <Option value="10">10</Option>
-            </Select>{' '}
-            entries
-          </p>
-          <Col>
-            <label style={{ width: '30%', float: 'right' }}>
-              Search by user's name:
-              <Input onChange={e => handleFilter(e.target.value.trim())} />
-            </label>
-            <Table
-              style={{ overflowY: 'hidden', overflowX: 'scroll' }}
-              dataSource={users}
-              columns={columns}
-            />
-          </Col>
-        </Row>
-      </Layout>
+            <p style={{ marginTop: '10px', fontSize: '16px' }}>
+              Show{' '}
+              <Select defaultValue="10">
+                <Option value="10">10</Option>
+              </Select>{' '}
+              entries
+            </p>
+            <Col>
+              <label style={{ width: '30%', float: 'right' }}>
+                Search by user's name:
+                <Input onChange={e => handleFilter(e.target.value.trim())} />
+              </label>
+              <Table
+                style={{ overflowY: 'hidden', overflowX: 'scroll' }}
+                dataSource={users}
+                columns={columns}
+              />
+            </Col>
+            <SiderComponent style={{ display: 'none' }} routeKey={routeKey} />
+          </Row>
+        </Layout>
+      </RouteKeyContext.Provider>
     </>
   )
 }

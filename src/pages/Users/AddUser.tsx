@@ -20,13 +20,6 @@ export default function AddUser() {
       description: 'New user successfully added',
     })
     history.push('/totalusers')
-
-    document
-      .getElementById('MenuItem1')
-      ?.classList.remove('ant-menu-item-selected')
-    document
-      .getElementById('MenuItem0')
-      ?.classList.add('ant-menu-item-selected')
   }
 
   const onFinishFailed = (errorInfo: any) => {
@@ -67,12 +60,12 @@ export default function AddUser() {
 
   const handleClickCancel = () => {
     //Xử lý đổi màu sidebar
-    document
-      .getElementById('MenuItem1')
-      ?.classList.remove('ant-menu-item-selected')
-    document
-      .getElementById('MenuItem0')
-      ?.classList.add('ant-menu-item-selected')
+    // document
+    //   .getElementById('MenuItem1')
+    //   ?.classList.remove('ant-menu-item-selected')
+    // document
+    //   .getElementById('MenuItem0')
+    //   ?.classList.add('ant-menu-item-selected')
   }
   return (
     <div>
