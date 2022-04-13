@@ -1,11 +1,13 @@
-import { Form, Select, Input, Button, notification, Upload } from 'antd'
 import history from '@utils/history'
-import { useState } from 'react'
 import { uuid } from '@utils/webHelper'
+import { Button, Form, Input, notification, Select } from 'antd'
+import { useContext, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { RouteKeyContext } from '../../Context/RouteContext'
 
 const { Option } = Select
 export default function AddUser() {
+  const context = useContext(RouteKeyContext)
   const [baseImage, setBaseImage] = useState('')
 
   const storageKey = 'UserList'
@@ -19,7 +21,7 @@ export default function AddUser() {
       message: 'Notification Add User',
       description: 'New user successfully added',
     })
-    history.push('/totalusers')
+    history.push('/users')
   }
 
   const onFinishFailed = (errorInfo: any) => {
@@ -58,15 +60,6 @@ export default function AddUser() {
     }
   }
 
-  const handleClickCancel = () => {
-    //Xử lý đổi màu sidebar
-    // document
-    //   .getElementById('MenuItem1')
-    //   ?.classList.remove('ant-menu-item-selected')
-    // document
-    //   .getElementById('MenuItem0')
-    //   ?.classList.add('ant-menu-item-selected')
-  }
   return (
     <div>
       <h1>Add User</h1>
@@ -176,10 +169,9 @@ export default function AddUser() {
               <Button type="primary" htmlType="submit">
                 Submit
               </Button>
-
-              <Link to="/totalusers">
+              <Link to="/users">
                 <Button
-                  onClick={handleClickCancel}
+                  onClick={context.handleClickCancel}
                   type="ghost"
                   style={{ marginLeft: '10px' }}>
                   Cancel

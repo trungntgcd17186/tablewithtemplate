@@ -11,18 +11,21 @@ import queryClient from '@lib/queryClient'
 import App from './App'
 import reportWebVitals from './reportWebVitals'
 import theme from '../theme'
+import { RouteKeyProvider } from './Context/RouteContext'
 
 ReactDOM.render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient()}>
-      <ThemeProvider theme={theme}>
-        <ConfigProvider locale={zhCN}>
-          <Router history={history}>
-            <App />
-          </Router>
-        </ConfigProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <RouteKeyProvider>
+      <QueryClientProvider client={queryClient()}>
+        <ThemeProvider theme={theme}>
+          <ConfigProvider locale={zhCN}>
+            <Router history={history}>
+              <App />
+            </Router>
+          </ConfigProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </RouteKeyProvider>
   </React.StrictMode>,
   document.getElementById('root')
 )

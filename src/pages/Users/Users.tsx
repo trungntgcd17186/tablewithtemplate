@@ -1,19 +1,12 @@
 import { DeleteFilled, EditFilled } from '@ant-design/icons'
-import { uuid } from '@utils/webHelper'
-import { Button, Col, Layout, Row, Select, Table, Tag, Input } from 'antd'
-import React, { useEffect, useState } from 'react'
-import { Link, useHistory } from 'react-router-dom'
-import { IUsers } from '@lib/types'
-import './User.css'
 import { routes } from '@lib/routes'
-import SiderComponent from '../../components/ui/Sider'
-import { createContext } from 'react'
-
-interface AppContextInterface {
-  routeKey: string
-}
-
-export const RouteKeyContext = createContext<AppContextInterface | null>(null)
+import { IUsers } from '@lib/types'
+import { uuid } from '@utils/webHelper'
+import { Button, Col, Input, Layout, Row, Select, Table, Tag } from 'antd'
+import React, { useContext, useEffect, useState } from 'react'
+import { useHistory } from 'react-router-dom'
+import { RouteKeyContext } from '../../Context/RouteContext'
+import './User.css'
 
 export const dataColumns = [
   {
@@ -33,13 +26,14 @@ export const dataColumns = [
 const { Option } = Select
 
 export default function Users() {
+  const context = useContext(RouteKeyContext)
+
   let history = useHistory()
   const storageKey = 'UserList'
 
   const dataString = localStorage.getItem(storageKey)
 
   const [users, setUsers] = useState<IUsers[]>([])
-  const [filter, setFilter] = useState<any>({ _page: 1 })
 
   const dataLS = JSON.parse(dataString || '[]')
 
@@ -112,11 +106,9 @@ export default function Users() {
       dataIndex: 'id',
       render: (id: string) => (
         <div className="action-container">
-          <Link to="/edituser">
-            <Tag className="action-edit" onClick={() => handleEdit(id)}>
-              <EditFilled style={{ color: '#4caf50' }} />
-            </Tag>
-          </Link>
+          <Tag className="action-edit" onClick={() => handleEdit(id)}>
+            <EditFilled style={{ color: '#4caf50' }} />
+          </Tag>
 
           <Tag className="action-delete" onClick={() => handleDelete(id)}>
             <DeleteFilled style={{ color: 'orange' }} />
@@ -152,9 +144,15 @@ export default function Users() {
     }
 
     localStorage.setItem('dataEdit', JSON.stringify(objInforUser))
-  }
 
-  const [routeKey, setRouteKey] = useState<AppContextInterface | null>(null)
+    //Xử lý active sidebar, import key route từ lib sau đó set key cho context.
+    const routeUsers: any = routes.filter(el => el.title === 'Users')
+    const routeChildren = routeUsers[0].children.filter(
+      (el: any) => el.title === 'Edit User'
+    )
+    context.setRouteKey(routeChildren[0].key)
+    history.push('/edituser')
+  }
 
   const handleClickAddNew = () => {
     const routeUsers: any = routes.filter(el => el.title === 'Users')
@@ -162,7 +160,7 @@ export default function Users() {
     const routeChildren = routeUsers[0].children.filter(
       (el: any) => el.title === 'Add User'
     )
-    setRouteKey(routeChildren[0].key)
+    context.setRouteKey(routeChildren[0].key)
     history.push('/adduser')
   }
 
@@ -185,36 +183,33 @@ export default function Users() {
 
   return (
     <>
-      <RouteKeyContext.Provider value={routeKey}>
-        <Layout className="layout-header"></Layout>
-        <Layout className="layout-content">
-          <Row style={{ display: 'flex', flexDirection: 'column' }}>
-            <Button onClick={handleClickAddNew} className="btn-add-new">
-              Add New +
-            </Button>
+      <Layout className="layout-header"></Layout>
+      <Layout className="layout-content">
+        <Row style={{ display: 'flex', flexDirection: 'column' }}>
+          <Button onClick={handleClickAddNew} className="btn-add-new">
+            Add New +
+          </Button>
 
-            <p style={{ marginTop: '10px', fontSize: '16px' }}>
-              Show{' '}
-              <Select defaultValue="10">
-                <Option value="10">10</Option>
-              </Select>{' '}
-              entries
-            </p>
-            <Col>
-              <label style={{ width: '30%', float: 'right' }}>
-                Search by user's name:
-                <Input onChange={e => handleFilter(e.target.value.trim())} />
-              </label>
-              <Table
-                style={{ overflowY: 'hidden', overflowX: 'scroll' }}
-                dataSource={users}
-                columns={columns}
-              />
-            </Col>
-            <SiderComponent style={{ display: 'none' }} routeKey={routeKey} />
-          </Row>
-        </Layout>
-      </RouteKeyContext.Provider>
+          <p style={{ marginTop: '10px', fontSize: '16px' }}>
+            Show{' '}
+            <Select defaultValue="10">
+              <Option value="10">10</Option>
+            </Select>{' '}
+            entries
+          </p>
+          <Col>
+            <label style={{ width: '30%', float: 'right' }}>
+              Search by user's name:
+              <Input onChange={e => handleFilter(e.target.value.trim())} />
+            </label>
+            <Table
+              style={{ overflowY: 'hidden', overflowX: 'scroll' }}
+              dataSource={users}
+              columns={columns}
+            />
+          </Col>
+        </Row>
+      </Layout>
     </>
   )
 }

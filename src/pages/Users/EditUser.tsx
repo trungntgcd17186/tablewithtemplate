@@ -1,13 +1,15 @@
-import { Button, Form, Input, notification, Select } from 'antd'
-import React, { useState } from 'react'
-import { Link, useHistory } from 'react-router-dom'
 import { IUsers } from '@lib/types'
+import { Button, Form, Input, notification, Select } from 'antd'
+import React, { useContext, useState } from 'react'
+import { Link, useHistory } from 'react-router-dom'
+import { RouteKeyContext } from '../../Context/RouteContext'
+
 const { Option } = Select
 
 export default function EditUser() {
+  const context = useContext(RouteKeyContext)
   let history = useHistory()
   const [baseImage, setBaseImage] = useState('')
-  const [number, setNumber] = useState(0)
 
   const dataEdit = JSON.parse(localStorage.getItem('dataEdit') || '[]')
   const storageKey = 'UserList'
@@ -34,14 +36,7 @@ export default function EditUser() {
     items = JSON.stringify(items)
     localStorage.setItem(storageKey, items)
 
-    history.push('/totalusers')
-
-    document
-      .getElementById('MenuItem1')
-      ?.classList.remove('ant-menu-item-selected')
-    document
-      .getElementById('MenuItem0')
-      ?.classList.add('ant-menu-item-selected')
+    history.push('/users')
   }
 
   const onFinishFailed = (errorInfo: {}) => {
@@ -79,16 +74,6 @@ export default function EditUser() {
         description: 'Size Image too big >100KB',
       })
     }
-  }
-
-  const handleClickCancel = () => {
-    //Xử lý đổi màu sidebar
-    document
-      .getElementById('MenuItem2')
-      ?.classList.remove('ant-menu-item-selected')
-    document
-      .getElementById('MenuItem0')
-      ?.classList.add('ant-menu-item-selected')
   }
 
   return (
@@ -171,11 +156,7 @@ export default function EditUser() {
                   message: 'Wrong format!',
                 },
               ]}>
-              <Input
-                // className="number"
-                type="number"
-                onChange={onNumberChange}
-              />
+              <Input type="number" onChange={onNumberChange} />
             </Form.Item>
 
             <Form.Item
@@ -227,9 +208,9 @@ export default function EditUser() {
                 Submit
               </Button>
 
-              <Link to="/totalusers">
+              <Link to="/users">
                 <Button
-                  onClick={handleClickCancel}
+                  onClick={context.handleClickCancel}
                   type="ghost"
                   style={{ marginLeft: '10px' }}>
                   Cancel

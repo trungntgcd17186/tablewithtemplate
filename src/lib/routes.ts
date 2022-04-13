@@ -29,7 +29,7 @@ export type RouteProps = {
  */
 export let routes = [
   {
-    key: '/quotes',
+    key: uuid(),
     title: 'Table',
     Icon: TableOutlined,
     url: '/quotes',
@@ -37,26 +37,26 @@ export let routes = [
     Component: Table,
   },
   {
-    key: '/usermanage',
+    key: uuid(),
     title: 'Users',
     Icon: UserOutlined,
     url: '/usermanage',
     exact: true,
     children: [
       {
-        key: '/totalusers',
+        key: uuid(),
         title: 'Total Users',
-        url: '/totalusers',
+        url: '/users',
         Component: Users,
       },
       {
-        key: '/adduser',
+        key: uuid(),
         title: 'Add User',
         url: '/adduser',
         Component: AddUser,
       },
       {
-        key: '/edituser',
+        key: uuid(),
         title: 'Edit User',
         url: '/edituser',
         Component: EditUser,
@@ -64,7 +64,7 @@ export let routes = [
     ],
   },
   {
-    key: '/Home',
+    key: uuid(),
     title: 'Home',
     Icon: UserOutlined,
     url: '/Home',
