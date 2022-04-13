@@ -11,6 +11,7 @@ const RouteKeyContext = createContext<any>('')
 function RouteKeyProvider({ children }: RouteKeyProviderProps) {
   let history = useHistory()
   const [routeKey, setRouteKey] = useState('')
+  const [idEdit, setIdEdit] = useState('')
 
   const handleClickCancel = () => {
     //Xử lý active sidebar, import key route từ lib sau đó set key cho context.
@@ -26,6 +27,8 @@ function RouteKeyProvider({ children }: RouteKeyProviderProps) {
     routeKey,
     setRouteKey,
     handleClickCancel,
+    idEdit,
+    setIdEdit,
   }
   return (
     <RouteKeyContext.Provider value={value}>

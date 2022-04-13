@@ -17,16 +17,6 @@ export type RouteProps = {
   exact?: boolean
 }
 
-/**
- * 共用的前端路由，也可以改成 hooks 加上權限來過濾資料、呼叫 API 取得 routes，例如:
- *
- * function useRoutes() {
- *   const { data } = useQuery(`/routes`) // or just a route variable
- *   const { user } = useAuth()
- *
- *   // filter route data then return
- * }
- */
 export let routes = [
   {
     key: uuid(),
@@ -40,25 +30,28 @@ export let routes = [
     key: uuid(),
     title: 'Users',
     Icon: UserOutlined,
-    url: '/usermanage',
+    url: '',
     exact: true,
     children: [
       {
         key: uuid(),
         title: 'Total Users',
         url: '/users',
+        exact: true,
         Component: Users,
       },
       {
         key: uuid(),
         title: 'Add User',
         url: '/adduser',
+        exact: true,
         Component: AddUser,
       },
       {
         key: uuid(),
         title: 'Edit User',
-        url: '/edituser',
+        url: `/users/:id`,
+        exact: true,
         Component: EditUser,
       },
     ],

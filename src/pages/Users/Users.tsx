@@ -144,14 +144,14 @@ export default function Users() {
     }
 
     localStorage.setItem('dataEdit', JSON.stringify(objInforUser))
-
+    context.setIdEdit(id)
     //Xử lý active sidebar, import key route từ lib sau đó set key cho context.
     const routeUsers: any = routes.filter(el => el.title === 'Users')
     const routeChildren = routeUsers[0].children.filter(
       (el: any) => el.title === 'Edit User'
     )
     context.setRouteKey(routeChildren[0].key)
-    history.push('/edituser')
+    history.push(`/users/id=${id}=edit`)
   }
 
   const handleClickAddNew = () => {
