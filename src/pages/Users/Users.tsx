@@ -1,4 +1,4 @@
-import { DeleteFilled, EditFilled } from '@ant-design/icons'
+import { DeleteFilled, EditFilled, ProfileOutlined } from '@ant-design/icons'
 import { routes } from '@lib/routes'
 import { IUsers } from '@lib/types'
 import { uuid } from '@utils/webHelper'
@@ -106,7 +106,12 @@ export default function Users() {
       dataIndex: 'id',
       render: (id: string) => (
         <div className="action-container">
-          <Tag className="action-edit" onClick={() => handleEdit(id)}>
+          <Tag className="" onClick={() => handleEdit(id, '', 'User Detail')}>
+            <ProfileOutlined />
+          </Tag>
+          <Tag
+            className="action-edit"
+            onClick={() => handleEdit(id, '/edit', 'Edit User')}>
             <EditFilled style={{ color: '#4caf50' }} />
           </Tag>
 
@@ -133,7 +138,7 @@ export default function Users() {
     setUsers(dataLS)
   }
 
-  const handleEdit = (id: number | string) => {
+  const handleEdit = (id: string, pathname: string, pageName: string) => {
     let items = JSON.parse(dataString || '[]')
     let objInforUser = {}
 
@@ -148,10 +153,10 @@ export default function Users() {
     //Xử lý active sidebar, import key route từ lib sau đó set key cho context.
     const routeUsers: any = routes.filter(el => el.title === 'Users')
     const routeChildren = routeUsers[0].children.filter(
-      (el: any) => el.title === 'Edit User'
+      (el: any) => el.title === pageName
     )
     context.setRouteKey(routeChildren[0].key)
-    history.push(`/users/id=${id}=edit`)
+    history.push(`/users/${id}${pathname}`)
   }
 
   const handleClickAddNew = () => {
