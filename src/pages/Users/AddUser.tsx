@@ -15,13 +15,25 @@ export default function AddUser() {
   const onFinish = (values: any) => {
     let oldItems = JSON.parse(localStorage.getItem(storageKey) || '[]') || []
 
-    oldItems.push({ ...values, id: uuid(), avatar: baseImage })
-    localStorage.setItem(storageKey, JSON.stringify(oldItems))
-    notification.open({
-      message: 'Notification Add User',
-      description: 'New user successfully added',
-    })
-    history.push('/users')
+    //Kiểm tra database có chứa username từ form submit hay không.
+    const filterResult = oldItems.map((el: { username: string }) =>
+      el.username.includes(values.username)
+    )
+    //Nếu tồn tại -> thông báo lỗi.
+    if (filterResult.includes(true)) {
+      notification.open({
+        message: 'Notification Add User',
+        description: 'Username already exists, please enter another username ',
+      })
+    } else {
+      oldItems.push({ ...values, id: uuid(), avatar: baseImage })
+      localStorage.setItem(storageKey, JSON.stringify(oldItems))
+      notification.open({
+        message: 'Notification Add User',
+        description: 'New user successfully added',
+      })
+      history.push('/users')
+    }
   }
 
   const onFinishFailed = (errorInfo: any) => {

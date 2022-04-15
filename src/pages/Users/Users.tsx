@@ -46,6 +46,86 @@ export default function Users() {
     }
   }, [dataString])
 
+  const handleDelete = (id: number | string) => {
+    let items = JSON.parse(dataString || '[]')
+
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].id == id) {
+        items.splice(i, 1)
+      }
+    }
+
+    items = JSON.stringify(items)
+    localStorage.setItem(storageKey, items)
+
+    setUsers(dataLS)
+  }
+
+  const handleEdit = (id: string, pathname: string, pageName: string) => {
+    let items = JSON.parse(dataString || '[]')
+    let objInforUser = {}
+
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].id == id) {
+        objInforUser = items[i]
+      }
+    }
+
+    localStorage.setItem('dataEdit', JSON.stringify(objInforUser))
+    context.setIdEdit(id)
+    //Xử lý active sidebar, import key route từ lib sau đó set key cho context.
+    const routeUsers: any = routes.filter(el => el.title === 'Users')
+    const routeChildren = routeUsers[0].children.filter(
+      (el: any) => el.title === pageName
+    )
+    context.setRouteKey(routeChildren[0].key)
+    history.push(`/users/${id}${pathname}`)
+  }
+
+  const handleClickAddNew = () => {
+    const routeUsers: any = routes.filter(el => el.title === 'Users')
+
+    const routeChildren = routeUsers[0].children.filter(
+      (el: any) => el.title === 'Add User'
+    )
+    context.setRouteKey(routeChildren[0].key)
+    history.push('/users/adduser')
+  }
+
+  const handleFilter = (e: string) => {
+    let items = JSON.parse(dataString || '[]')
+
+    //Nhận array result gồm tên các users
+    const result = items.map((item: any) => item.name)
+
+    //Kiểm tra array result có chứa value input hay không. Nếu có lấy ra tên user.
+    const nameResponse = result.find((item: string) =>
+      item.toLowerCase().includes(e.toLowerCase())
+    )
+
+    if (nameResponse) {
+      const filterResult = items.filter((el: any) => el.name === nameResponse)
+      setUsers(filterResult)
+    } else {
+      setUsers([])
+    }
+    if (e.length === 0) {
+      setUsers(items)
+    }
+  }
+
+  const handleSelect = (e: string) => {
+    let items = JSON.parse(dataString || '[]')
+
+    //Nhận array result gồm các object chứa role = e.
+    const result = items.filter((item: any) => item.role === e)
+    if (e) {
+      setUsers(result)
+    } else {
+      setUsers(items)
+    }
+  }
+
   const columns = [
     {
       title: 'ID',
@@ -98,7 +178,15 @@ export default function Users() {
       dataIndex: 'company',
     },
     {
-      title: 'Role',
+      title: () => (
+        <div>
+          Role
+          <Select allowClear onChange={e => handleSelect(e)}>
+            <Option value="admin">admin</Option>
+            <Option value="member">member</Option>
+          </Select>
+        </div>
+      ),
       dataIndex: 'role',
     },
     {
@@ -122,69 +210,6 @@ export default function Users() {
       ),
     },
   ]
-
-  const handleDelete = (id: number | string) => {
-    let items = JSON.parse(dataString || '[]')
-
-    for (let i = 0; i < items.length; i++) {
-      if (items[i].id == id) {
-        items.splice(i, 1)
-      }
-    }
-
-    items = JSON.stringify(items)
-    localStorage.setItem(storageKey, items)
-
-    setUsers(dataLS)
-  }
-
-  const handleEdit = (id: string, pathname: string, pageName: string) => {
-    let items = JSON.parse(dataString || '[]')
-    let objInforUser = {}
-
-    for (let i = 0; i < items.length; i++) {
-      if (items[i].id == id) {
-        objInforUser = items[i]
-      }
-    }
-
-    localStorage.setItem('dataEdit', JSON.stringify(objInforUser))
-    context.setIdEdit(id)
-    //Xử lý active sidebar, import key route từ lib sau đó set key cho context.
-    const routeUsers: any = routes.filter(el => el.title === 'Users')
-    const routeChildren = routeUsers[0].children.filter(
-      (el: any) => el.title === pageName
-    )
-    context.setRouteKey(routeChildren[0].key)
-    history.push(`/users/${id}${pathname}`)
-  }
-
-  const handleClickAddNew = () => {
-    const routeUsers: any = routes.filter(el => el.title === 'Users')
-
-    const routeChildren = routeUsers[0].children.filter(
-      (el: any) => el.title === 'Add User'
-    )
-    context.setRouteKey(routeChildren[0].key)
-    history.push('/users/adduser')
-  }
-
-  const handleFilter = (e: string) => {
-    let items = JSON.parse(dataString || '[]')
-    let arrInforUser = []
-
-    for (let i = 0; i < items.length; i++) {
-      if (Object.values(items[i]).includes(e)) {
-        console.log(items[i])
-
-        arrInforUser.push(items[i])
-
-        return setUsers(arrInforUser)
-      } else {
-        return setUsers(dataLS)
-      }
-    }
-  }
 
   return (
     <>
