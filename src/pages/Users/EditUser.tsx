@@ -165,7 +165,7 @@ export default function EditUser() {
               rules={[
                 {
                   required: true,
-                  message: 'Please input user phone number!',
+                  message: 'Please input user website!',
                 },
                 {
                   pattern: new RegExp(

@@ -60,6 +60,12 @@ export default function AddUser() {
     }
   }
 
+  const onNumberChange = (e: any) => {
+    if (e.target && e.keyCode >= 48 && e.keyCode <= 57) {
+      e.target.value = ''
+    }
+  }
+
   return (
     <div>
       <h1>Add User</h1>
@@ -132,10 +138,24 @@ export default function AddUser() {
                   message: 'Wrong format!',
                 },
               ]}>
-              <Input />
+              <Input type="number" onChange={onNumberChange} />
             </Form.Item>
 
-            <Form.Item label="Website" name="website">
+            <Form.Item
+              label="Website"
+              name="website"
+              rules={[
+                {
+                  required: true,
+                  message: 'Please input user website!',
+                },
+                {
+                  pattern: new RegExp(
+                    '^(http[s]?:\\/\\/(www\\.)?|ftp:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_+~#=]+)+((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?'
+                  ),
+                  message: 'Wrong format!',
+                },
+              ]}>
               <Input />
             </Form.Item>
 
