@@ -166,7 +166,7 @@ export default function Users() {
       (el: any) => el.title === 'Add User'
     )
     context.setRouteKey(routeChildren[0].key)
-    history.push('/adduser')
+    history.push('/users/adduser')
   }
 
   const handleFilter = (e: string) => {

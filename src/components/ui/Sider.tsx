@@ -24,7 +24,7 @@ function SiderComponent(props: Props) {
   }
 
   const renderMenuItem = (route: RouteProps) => {
-    return (
+    return route.title !== 'Edit User' && route.title !== 'User Detail' ? (
       <Menu.Item
         key={route.key}
         disabled={route.disabled}
@@ -32,6 +32,8 @@ function SiderComponent(props: Props) {
         onClick={handleTo(context, route.key, route.url)}>
         {route.title}
       </Menu.Item>
+    ) : (
+      ''
     )
   }
 

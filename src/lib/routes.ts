@@ -44,7 +44,7 @@ export let routes = [
       {
         key: uuid(),
         title: 'Add User',
-        url: '/adduser',
+        url: '/users/adduser',
         exact: true,
         Component: AddUser,
       },
@@ -52,14 +52,12 @@ export let routes = [
         key: uuid(),
         title: 'Edit User',
         url: `/users/:slug/edit`,
-        exact: true,
         Component: EditUser,
       },
       {
         key: uuid(),
         title: 'User Detail',
         url: `/users/:slug`,
-        exact: true,
         Component: UserDetail,
       },
     ],

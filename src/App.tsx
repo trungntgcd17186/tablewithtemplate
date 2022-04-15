@@ -5,12 +5,32 @@ import Sider from '@components/Sider'
 import { RouteProps, routes } from '@lib/routes'
 import HomePage from '@pages/HomePage'
 import { Layout } from 'antd'
-import { Suspense } from 'react'
-import { Route, Switch } from 'react-router-dom'
+import { Suspense, useContext } from 'react'
+import { Route, Switch, useLocation } from 'react-router-dom'
+import { RouteKeyContext } from './Context/RouteContext'
 
 function App() {
+  const context = useContext(RouteKeyContext)
+  let location = useLocation()
+
   const renderRoute = (route: RouteProps) => {
     if (!route.Component || !route.url) {
+      return null
+    }
+
+    //Xử lý check case sai id user khi edit.
+    if (
+      route.title === 'Edit User' &&
+      location.pathname !== `/users/${context.idEdit}/edit`
+    ) {
+      return null
+    }
+
+    //Xử lý check case sai id user khi xem info user.
+    if (
+      route.title === 'User Detail' &&
+      location.pathname !== `/users/${context.idEdit}`
+    ) {
       return null
     }
 
