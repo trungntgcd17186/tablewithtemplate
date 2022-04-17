@@ -14,23 +14,21 @@ function App() {
   let location = useLocation()
 
   const renderRoute = (route: RouteProps) => {
+    const id = localStorage.getItem('idEdit')
+
     if (!route.Component || !route.url) {
       return null
     }
-
     //Xử lý check case sai id user khi edit.
     if (
       route.title === 'Edit User' &&
-      location.pathname !== `/users/${context.idEdit}/edit`
+      location.pathname !== `/users/${id}/edit`
     ) {
       return null
     }
 
-    //Xử lý check case sai id user khi xem info user.
-    if (
-      route.title === 'User Detail' &&
-      location.pathname !== `/users/${context.idEdit}`
-    ) {
+    // Xử lý check case sai id user khi xem info user.
+    if (route.title === 'User Detail' && location.pathname !== `/users/${id}`) {
       return null
     }
 

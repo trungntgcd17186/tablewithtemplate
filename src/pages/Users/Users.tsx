@@ -1,8 +1,20 @@
 import { DeleteFilled, EditFilled, ProfileOutlined } from '@ant-design/icons'
+import { db } from '@components/firebaseConfig'
 import { routes } from '@lib/routes'
 import { IUsers } from '@lib/types'
 import { uuid } from '@utils/webHelper'
-import { Button, Col, Input, Layout, Row, Select, Table, Tag } from 'antd'
+import {
+  Button,
+  Col,
+  Input,
+  Layout,
+  Modal,
+  Row,
+  Select,
+  Table,
+  Tag,
+} from 'antd'
+import { collection, deleteDoc, doc, getDocs } from 'firebase/firestore'
 import React, { useContext, useEffect, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import { RouteKeyContext } from '../../Context/RouteContext'
@@ -33,46 +45,39 @@ export default function Users() {
 
   const dataString = localStorage.getItem(storageKey)
 
-  const [users, setUsers] = useState<IUsers[]>([])
+  const [isModalVisible, setIsModalVisible] = useState(false)
+  const [users, setUsers] = useState<any[]>([])
+  const [reRender, setReRender] = useState(false)
 
-  const dataLS = JSON.parse(dataString || '[]')
+  const [id, setId] = useState('')
+  const [isFilter, setIsFilter] = useState(false)
+
+  const usersCollectionRef = collection(db, 'users')
 
   useEffect(() => {
-    if (dataString) {
-      setUsers(dataLS)
-    } else {
-      setUsers(dataColumns)
-      localStorage.setItem(storageKey, JSON.stringify(dataColumns))
+    const getUsers = async () => {
+      const data = await getDocs(usersCollectionRef)
+      const listUser = data.docs.map(doc => ({ ...doc.data(), id: doc.id }))
+      setUsers(listUser)
+      context.setMemory(listUser)
     }
-  }, [dataString])
+    getUsers()
+  }, [reRender])
 
-  const handleDelete = (id: number | string) => {
-    let items = JSON.parse(dataString || '[]')
+  useEffect(() => {
+    setUsers(context.memory)
+  }, [isFilter])
 
-    for (let i = 0; i < items.length; i++) {
-      if (items[i].id == id) {
-        items.splice(i, 1)
-      }
-    }
-
-    items = JSON.stringify(items)
-    localStorage.setItem(storageKey, items)
-
-    setUsers(dataLS)
-  }
-
-  const handleEdit = (id: string, pathname: string, pageName: string) => {
-    let items = JSON.parse(dataString || '[]')
-    let objInforUser = {}
-
-    for (let i = 0; i < items.length; i++) {
-      if (items[i].id == id) {
-        objInforUser = items[i]
-      }
-    }
-
-    localStorage.setItem('dataEdit', JSON.stringify(objInforUser))
+  const handleEdit = async (id: string, pathname: string, pageName: string) => {
     context.setIdEdit(id)
+
+    const data = await getDocs(collection(db, 'users'))
+    const listUsers = data.docs.map(doc => ({ ...doc.data(), id: doc.id }))
+
+    const userEdit = listUsers.find((user: any) => user.id === id)
+
+    context.setDataEdit(userEdit)
+
     //Xử lý active sidebar, import key route từ lib sau đó set key cho context.
     const routeUsers: any = routes.filter(el => el.title === 'Users')
     const routeChildren = routeUsers[0].children.filter(
@@ -93,10 +98,8 @@ export default function Users() {
   }
 
   const handleFilter = (e: string) => {
-    let items = JSON.parse(dataString || '[]')
-
     //Nhận array result gồm tên các users
-    const result = items.map((item: any) => item.name)
+    const result = users.map((item: any) => item.name)
 
     //Kiểm tra array result có chứa value input hay không. Nếu có lấy ra tên user.
     const nameResponse = result.find((item: string) =>
@@ -104,26 +107,40 @@ export default function Users() {
     )
 
     if (nameResponse) {
-      const filterResult = items.filter((el: any) => el.name === nameResponse)
+      const filterResult = users.filter((el: any) => el.name === nameResponse)
       setUsers(filterResult)
     } else {
       setUsers([])
     }
     if (e.length === 0) {
-      setUsers(items)
+      setIsFilter(!isFilter)
     }
   }
 
   const handleSelect = (e: string) => {
-    let items = JSON.parse(dataString || '[]')
-
     //Nhận array result gồm các object chứa role = e.
-    const result = items.filter((item: any) => item.role === e)
+    const result = users.filter((item: any) => item.role === e)
     if (e) {
       setUsers(result)
     } else {
-      setUsers(items)
+      setUsers(context.memory)
     }
+  }
+
+  const showModal = (id: string) => {
+    setId(id)
+    setIsModalVisible(true)
+  }
+
+  const handleOk = async () => {
+    const userDoc = doc(db, 'users', id)
+    await deleteDoc(userDoc)
+    setReRender(!reRender)
+    setIsModalVisible(false)
+  }
+
+  const handleCancel = () => {
+    setIsModalVisible(false)
   }
 
   const columns = [
@@ -203,7 +220,7 @@ export default function Users() {
             <EditFilled style={{ color: '#4caf50' }} />
           </Tag>
 
-          <Tag className="action-delete" onClick={() => handleDelete(id)}>
+          <Tag className="action-delete" onClick={() => showModal(id)}>
             <DeleteFilled style={{ color: 'orange' }} />
           </Tag>
         </div>
@@ -213,6 +230,13 @@ export default function Users() {
 
   return (
     <>
+      <Modal
+        title="Basic Modal"
+        visible={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}>
+        <p>Delete Confirm</p>
+      </Modal>
       <Layout className="layout-header"></Layout>
       <Layout className="layout-content">
         <Row style={{ display: 'flex', flexDirection: 'column' }}>

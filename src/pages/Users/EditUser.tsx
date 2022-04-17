@@ -1,5 +1,6 @@
-import { IUsers } from '@lib/types'
+import { db } from '@components/firebaseConfig'
 import { Button, Form, Input, notification, Select } from 'antd'
+import { doc, updateDoc } from 'firebase/firestore'
 import React, { useContext, useState } from 'react'
 import { Link, useHistory } from 'react-router-dom'
 import { RouteKeyContext } from '../../Context/RouteContext'
@@ -11,31 +12,15 @@ export default function EditUser() {
   let history = useHistory()
   const [baseImage, setBaseImage] = useState('')
 
-  const dataEdit = JSON.parse(localStorage.getItem('dataEdit') || '[]')
-  const storageKey = 'UserList'
-  const dataString = localStorage.getItem(storageKey)
-
   const onNumberChange = (e: any) => {
     if (e.target && e.keyCode >= 48 && e.keyCode <= 57) {
       e.target.value = ''
     }
   }
 
-  const onFinish = (values: IUsers) => {
-    //Xử lý submit sau khi edit
-    let items = JSON.parse(dataString || '[]')
-    for (let i = 0; i < items.length; i++) {
-      //Tìm id user cần edit theo id columns
-      if (items[i].id == dataEdit.id) {
-        const objectSubmit = { ...values, avatar: baseImage, id: dataEdit.id }
-        //Chạy vòng for đến vị trí id cần edit sau đó gán bằng object mới lấy từ form submit, push lại id từ lS, thêm lại avatar nếu người dùng upload ảnh.
-        items[i] = { ...objectSubmit }
-      }
-    }
-
-    items = JSON.stringify(items)
-    localStorage.setItem(storageKey, items)
-
+  const onFinish = async (values: {}) => {
+    const userDoc = doc(db, 'users', context.idEdit)
+    await updateDoc(userDoc, { ...values, avatar: baseImage })
     history.push('/users')
   }
 
@@ -89,14 +74,14 @@ export default function EditUser() {
             labelCol={{ span: 3 }}
             wrapperCol={{ span: 32 }}
             initialValues={{
-              name: dataEdit.name,
-              username: dataEdit.username,
-              email: dataEdit.email,
-              address: dataEdit.address,
-              phoneNumber: dataEdit.phoneNumber,
-              website: dataEdit.website,
-              company: dataEdit.company,
-              role: dataEdit.role,
+              name: context.dataEdit.name,
+              username: context.dataEdit.username,
+              email: context.dataEdit.email,
+              address: context.dataEdit.address,
+              phoneNumber: context.dataEdit.phoneNumber,
+              website: context.dataEdit.website,
+              company: context.dataEdit.company,
+              role: context.dataEdit.role,
             }}
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}

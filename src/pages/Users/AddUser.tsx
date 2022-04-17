@@ -1,22 +1,21 @@
-import history from '@utils/history'
-import { uuid } from '@utils/webHelper'
+import { db } from '@components/firebaseConfig'
 import { Button, Form, Input, notification, Select } from 'antd'
+import { addDoc, collection } from 'firebase/firestore'
 import { useContext, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 import { RouteKeyContext } from '../../Context/RouteContext'
 
 const { Option } = Select
 export default function AddUser() {
   const context = useContext(RouteKeyContext)
-  const [baseImage, setBaseImage] = useState('')
+  let history = useHistory()
 
+  const [baseImage, setBaseImage] = useState('')
   const storageKey = 'UserList'
 
-  const onFinish = (values: any) => {
-    let oldItems = JSON.parse(localStorage.getItem(storageKey) || '[]') || []
-
+  const onFinish = async (values: any) => {
     //Kiểm tra database có chứa username từ form submit hay không.
-    const filterResult = oldItems.map((el: { username: string }) =>
+    const filterResult = context.memory.map((el: { username: string }) =>
       el.username.includes(values.username)
     )
     //Nếu tồn tại -> thông báo lỗi.
@@ -26,12 +25,16 @@ export default function AddUser() {
         description: 'Username already exists, please enter another username ',
       })
     } else {
-      oldItems.push({ ...values, id: uuid(), avatar: baseImage })
-      localStorage.setItem(storageKey, JSON.stringify(oldItems))
-      notification.open({
-        message: 'Notification Add User',
-        description: 'New user successfully added',
-      })
+      try {
+        const docRef = await addDoc(collection(db, 'users'), {
+          ...values,
+          avatar: baseImage,
+        })
+        console.log('Document written with ID: ', docRef.id)
+      } catch (e) {
+        console.error('Error adding document: ', e)
+      }
+
       history.push('/users')
     }
   }
