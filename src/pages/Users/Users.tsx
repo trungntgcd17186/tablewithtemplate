@@ -13,8 +13,18 @@ import {
   Select,
   Table,
   Tag,
+  Pagination,
 } from 'antd'
-import { collection, deleteDoc, doc, getDocs } from 'firebase/firestore'
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  query,
+  where,
+  limit,
+  startAfter,
+} from 'firebase/firestore'
 import React, { useContext, useEffect, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import { RouteKeyContext } from '../../Context/RouteContext'
@@ -41,9 +51,6 @@ export default function Users() {
   const context = useContext(RouteKeyContext)
 
   let history = useHistory()
-  const storageKey = 'UserList'
-
-  const dataString = localStorage.getItem(storageKey)
 
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [users, setUsers] = useState<any[]>([])
@@ -55,18 +62,21 @@ export default function Users() {
   const usersCollectionRef = collection(db, 'users')
 
   useEffect(() => {
-    const getUsers = async () => {
-      const data = await getDocs(usersCollectionRef)
-      const listUser = data.docs.map(doc => ({ ...doc.data(), id: doc.id }))
-      setUsers(listUser)
-      context.setMemory(listUser)
-    }
     getUsers()
   }, [reRender])
 
   useEffect(() => {
     setUsers(context.memory)
   }, [isFilter])
+
+  const getUsers = async () => {
+    const q = query(usersCollectionRef, limit(5))
+    const data = await getDocs(q)
+    const listUser = data.docs.map(doc => ({ ...doc.data(), id: doc.id }))
+
+    setUsers(listUser)
+    context.setMemory(listUser)
+  }
 
   const handleEdit = async (id: string, pathname: string, pageName: string) => {
     context.setIdEdit(id)
@@ -102,12 +112,15 @@ export default function Users() {
     const result = users.map((item: any) => item.name)
 
     //Kiểm tra array result có chứa value input hay không. Nếu có lấy ra tên user.
-    const nameResponse = result.find((item: string) =>
+    const nameResponse = result.filter((item: string) =>
       item.toLowerCase().includes(e.toLowerCase())
     )
 
     if (nameResponse) {
-      const filterResult = users.filter((el: any) => el.name === nameResponse)
+      const filterResult = users.filter((user: any) =>
+        nameResponse.includes(user.name)
+      )
+      console.log(filterResult)
       setUsers(filterResult)
     } else {
       setUsers([])
@@ -117,11 +130,12 @@ export default function Users() {
     }
   }
 
-  const handleSelect = (e: string) => {
-    //Nhận array result gồm các object chứa role = e.
-    const result = users.filter((item: any) => item.role === e)
+  const handleSelect = async (e: string) => {
     if (e) {
-      setUsers(result)
+      const q = query(usersCollectionRef, where('role', '==', e), limit(5))
+      const data = await getDocs(q)
+      const listUser = data.docs.map(doc => ({ ...doc.data(), id: doc.id }))
+      setUsers(listUser)
     } else {
       setUsers(context.memory)
     }
@@ -228,6 +242,18 @@ export default function Users() {
     },
   ]
 
+  const handleChangePage = async (page: number) => {
+    const q = query(usersCollectionRef, limit(5))
+    const data = await getDocs(q)
+    const lastUser = data.docs[data.docs.length - 1]
+    console.log(lastUser)
+    const next = query(usersCollectionRef, startAfter(lastUser), limit(5))
+    const dataNext = await getDocs(next)
+    const listUser = dataNext.docs.map(doc => ({ ...doc.data(), id: doc.id }))
+    setUsers(listUser)
+    context.setMemory(listUser)
+  }
+
   return (
     <>
       <Modal
@@ -260,7 +286,9 @@ export default function Users() {
               style={{ overflowY: 'hidden', overflowX: 'scroll' }}
               dataSource={users}
               columns={columns}
+              pagination={false}
             />
+            <Pagination onChange={page => handleChangePage(page)} total={100} />
           </Col>
         </Row>
       </Layout>

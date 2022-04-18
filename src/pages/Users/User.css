@@ -36,6 +36,13 @@
   /* margin-top: -40px; */
 }
 
+.ant-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
 .action-container {
   display: flex;
 }
