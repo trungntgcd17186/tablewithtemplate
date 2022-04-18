@@ -13,7 +13,6 @@ import {
   Select,
   Table,
   Tag,
-  Pagination,
 } from 'antd'
 import {
   collection,
@@ -24,6 +23,11 @@ import {
   where,
   limit,
   startAfter,
+  endBefore,
+  startAt,
+  orderBy,
+  endAt,
+  limitToLast,
 } from 'firebase/firestore'
 import React, { useContext, useEffect, useState } from 'react'
 import { useHistory } from 'react-router-dom'
@@ -54,9 +58,12 @@ export default function Users() {
 
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [users, setUsers] = useState<any[]>([])
-  const [reRender, setReRender] = useState(false)
+  const [lastUser, setLastUser] = useState<any>({})
+  const [startUser, setStartUser] = useState<any>({})
+  const [page, setPage] = useState(1)
 
   const [id, setId] = useState('')
+  const [reRender, setReRender] = useState(false)
   const [isFilter, setIsFilter] = useState(false)
 
   const usersCollectionRef = collection(db, 'users')
@@ -70,10 +77,46 @@ export default function Users() {
   }, [isFilter])
 
   const getUsers = async () => {
-    const q = query(usersCollectionRef, limit(5))
-    const data = await getDocs(q)
-    const listUser = data.docs.map(doc => ({ ...doc.data(), id: doc.id }))
+    const q = query(usersCollectionRef, orderBy('username', 'asc'), limit(5))
+    updateState(q)
+  }
 
+  const handleNextPage = async () => {
+    const q = query(
+      usersCollectionRef,
+      orderBy('username', 'asc'),
+      startAfter(lastUser),
+      limit(5)
+    )
+    updateState(q)
+    setPage(page + 1)
+  }
+
+  const handlePreviousPage = async () => {
+    if (page > 1) {
+      const q = query(
+        usersCollectionRef,
+        orderBy('username', 'asc'),
+        endBefore(startUser),
+        limitToLast(6)
+      )
+      updateState(q)
+      setPage(page - 1)
+    }
+  }
+
+  const updateState = async (q: any) => {
+    const data: any = await getDocs(q)
+    const listUser = data.docs.map((doc: any) => ({
+      ...doc.data(),
+      id: doc.id,
+    }))
+
+    const lastDoc = data.docs[data.docs.length - 1]
+    const startDoc = data.docs[0]
+
+    setLastUser(lastDoc)
+    setStartUser(startDoc)
     setUsers(listUser)
     context.setMemory(listUser)
   }
@@ -81,13 +124,18 @@ export default function Users() {
   const handleEdit = async (id: string, pathname: string, pageName: string) => {
     context.setIdEdit(id)
 
-    const data = await getDocs(collection(db, 'users'))
-    const listUsers = data.docs.map(doc => ({ ...doc.data(), id: doc.id }))
-
-    const userEdit = listUsers.find((user: any) => user.id === id)
+    const userEdit = users.find((user: any) => user.id === id)
 
     context.setDataEdit(userEdit)
 
+    handleActiveSidebar(id, pathname, pageName)
+  }
+
+  const handleActiveSidebar = (
+    id: string,
+    pathname: string,
+    pageName: string
+  ) => {
     //Xử lý active sidebar, import key route từ lib sau đó set key cho context.
     const routeUsers: any = routes.filter(el => el.title === 'Users')
     const routeChildren = routeUsers[0].children.filter(
@@ -98,13 +146,7 @@ export default function Users() {
   }
 
   const handleClickAddNew = () => {
-    const routeUsers: any = routes.filter(el => el.title === 'Users')
-
-    const routeChildren = routeUsers[0].children.filter(
-      (el: any) => el.title === 'Add User'
-    )
-    context.setRouteKey(routeChildren[0].key)
-    history.push('/users/adduser')
+    handleActiveSidebar('', 'adduser', 'Add User')
   }
 
   const handleFilter = (e: string) => {
@@ -120,7 +162,7 @@ export default function Users() {
       const filterResult = users.filter((user: any) =>
         nameResponse.includes(user.name)
       )
-      console.log(filterResult)
+
       setUsers(filterResult)
     } else {
       setUsers([])
@@ -242,18 +284,6 @@ export default function Users() {
     },
   ]
 
-  const handleChangePage = async (page: number) => {
-    const q = query(usersCollectionRef, limit(5))
-    const data = await getDocs(q)
-    const lastUser = data.docs[data.docs.length - 1]
-    console.log(lastUser)
-    const next = query(usersCollectionRef, startAfter(lastUser), limit(5))
-    const dataNext = await getDocs(next)
-    const listUser = dataNext.docs.map(doc => ({ ...doc.data(), id: doc.id }))
-    setUsers(listUser)
-    context.setMemory(listUser)
-  }
-
   return (
     <>
       <Modal
@@ -288,7 +318,31 @@ export default function Users() {
               columns={columns}
               pagination={false}
             />
-            <Pagination onChange={page => handleChangePage(page)} total={100} />
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                marginTop: '10px',
+              }}>
+              <Button onClick={handlePreviousPage}>Previous</Button>
+              <div
+                style={{
+                  width: '30px',
+                  height: '32px',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  border: '1px solid silver',
+                  marginLeft: '5px',
+                }}>
+                {page}
+              </div>
+              <Button
+                style={{ width: '80px', marginLeft: '5px' }}
+                onClick={handleNextPage}>
+                Next
+              </Button>
+            </div>
           </Col>
         </Row>
       </Layout>
