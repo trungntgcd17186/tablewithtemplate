@@ -11,7 +11,6 @@ export default function AddUser() {
   let history = useHistory()
 
   const [baseImage, setBaseImage] = useState('')
-  const storageKey = 'UserList'
 
   const onFinish = async (values: any) => {
     //Kiểm tra database có chứa username từ form submit hay không.
@@ -93,16 +92,6 @@ export default function AddUser() {
             name="basic"
             labelCol={{ span: 3 }}
             wrapperCol={{ span: 32 }}
-            initialValues={{
-              name: context.dataEdit.name,
-              username: context.dataEdit.username,
-              email: context.dataEdit.email,
-              address: context.dataEdit.address,
-              phoneNumber: context.dataEdit.phoneNumber,
-              website: context.dataEdit.website,
-              company: context.dataEdit.company,
-              role: context.dataEdit.role,
-            }}
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}
             autoComplete="off">

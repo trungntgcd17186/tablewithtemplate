@@ -1,8 +1,6 @@
 import { DeleteFilled, EditFilled, ProfileOutlined } from '@ant-design/icons'
 import { db } from '@components/firebaseConfig'
 import { routes } from '@lib/routes'
-import { IUsers } from '@lib/types'
-import { uuid } from '@utils/webHelper'
 import {
   Button,
   Col,
@@ -18,36 +16,19 @@ import {
   collection,
   deleteDoc,
   doc,
-  getDocs,
-  query,
-  where,
-  limit,
-  startAfter,
   endBefore,
-  startAt,
-  orderBy,
-  endAt,
+  getDocs,
+  limit,
   limitToLast,
+  orderBy,
+  query,
+  startAfter,
+  where,
 } from 'firebase/firestore'
 import React, { useContext, useEffect, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import { RouteKeyContext } from '../../Context/RouteContext'
 import './User.css'
-
-export const dataColumns = [
-  {
-    id: uuid(),
-    name: 'Leanne Graham',
-    username: 'Bret',
-    email: 'Sincere@april.biz',
-    address: 'Kulas Knight',
-    phoneNumber: '0123456789',
-    website: 'http://hildegard.org',
-    company: 'Romaguera-Crona',
-    role: 'member',
-    avatar: '',
-  },
-]
 
 const { Option } = Select
 
@@ -59,10 +40,11 @@ export default function Users() {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [users, setUsers] = useState<any[]>([])
   const [lastUser, setLastUser] = useState<any>({})
+
   const [startUser, setStartUser] = useState<any>({})
   const [page, setPage] = useState(1)
-
   const [id, setId] = useState('')
+
   const [reRender, setReRender] = useState(false)
   const [isFilter, setIsFilter] = useState(false)
 
@@ -123,12 +105,14 @@ export default function Users() {
 
   const handleEdit = async (id: string, pathname: string, pageName: string) => {
     context.setIdEdit(id)
-
     const userEdit = users.find((user: any) => user.id === id)
-
     context.setDataEdit(userEdit)
 
     handleActiveSidebar(id, pathname, pageName)
+  }
+
+  const handleClickAddNew = () => {
+    handleActiveSidebar('', 'adduser', 'Add User')
   }
 
   const handleActiveSidebar = (
@@ -143,10 +127,6 @@ export default function Users() {
     )
     context.setRouteKey(routeChildren[0].key)
     history.push(`/users/${id}${pathname}`)
-  }
-
-  const handleClickAddNew = () => {
-    handleActiveSidebar('', 'adduser', 'Add User')
   }
 
   const handleFilter = (e: string) => {
@@ -295,51 +275,33 @@ export default function Users() {
       </Modal>
       <Layout className="layout-header"></Layout>
       <Layout className="layout-content">
-        <Row style={{ display: 'flex', flexDirection: 'column' }}>
+        <Row className="user-table-container">
           <Button onClick={handleClickAddNew} className="btn-add-new">
             Add New +
           </Button>
 
-          <p style={{ marginTop: '10px', fontSize: '16px' }}>
-            Show{' '}
+          <p className="show-entries">
+            Show
             <Select defaultValue="10">
               <Option value="10">10</Option>
-            </Select>{' '}
+            </Select>
             entries
           </p>
           <Col>
-            <label style={{ width: '30%', float: 'right' }}>
+            <label className="label-search">
               Search by user's name:
               <Input onChange={e => handleFilter(e.target.value.trim())} />
             </label>
             <Table
-              style={{ overflowY: 'hidden', overflowX: 'scroll' }}
+              style={{ overflowX: 'scroll', overflowY: 'hidden' }}
               dataSource={users}
               columns={columns}
               pagination={false}
             />
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                marginTop: '10px',
-              }}>
+            <div className="btn-page-container">
               <Button onClick={handlePreviousPage}>Previous</Button>
-              <div
-                style={{
-                  width: '30px',
-                  height: '32px',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  border: '1px solid silver',
-                  marginLeft: '5px',
-                }}>
-                {page}
-              </div>
-              <Button
-                style={{ width: '80px', marginLeft: '5px' }}
-                onClick={handleNextPage}>
+              <div className="page-number">{page}</div>
+              <Button className="next-btn" onClick={handleNextPage}>
                 Next
               </Button>
             </div>

@@ -189,3 +189,39 @@ p {
   margin-bottom: 20px;
   color: #666;
 }
+
+.page-number {
+  width: 30px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid silver;
+  margin-left: 5px;
+}
+
+.next-btn {
+  width: 80px;
+  margin-left: 5px;
+}
+
+.btn-page-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.label-search {
+  width: 30%;
+  float: right;
+}
+
+.show-entries {
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+.user-table-container {
+  display: flex;
+  flex-direction: column;
+}
