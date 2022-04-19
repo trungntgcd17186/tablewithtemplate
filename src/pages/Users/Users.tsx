@@ -88,7 +88,8 @@ export default function Users() {
   }
 
   const updateState = async (q: any) => {
-    const data: any = await getDocs(q)
+    const data: { docs: any[] } = await getDocs(q)
+    console.log(data)
     const listUser = data.docs.map((doc: any) => ({
       ...doc.data(),
       id: doc.id,
@@ -105,7 +106,7 @@ export default function Users() {
 
   const handleEdit = async (id: string, pathname: string, pageName: string) => {
     context.setIdEdit(id)
-    const userEdit = users.find((user: any) => user.id === id)
+    const userEdit = users.find((user: { id: string }) => user.id === id)
     context.setDataEdit(userEdit)
 
     handleActiveSidebar(id, pathname, pageName)
@@ -123,7 +124,7 @@ export default function Users() {
     //Xử lý active sidebar, import key route từ lib sau đó set key cho context.
     const routeUsers: any = routes.filter(el => el.title === 'Users')
     const routeChildren = routeUsers[0].children.filter(
-      (el: any) => el.title === pageName
+      (el: { title: string }) => el.title === pageName
     )
     context.setRouteKey(routeChildren[0].key)
     history.push(`/users/${id}${pathname}`)
@@ -131,7 +132,7 @@ export default function Users() {
 
   const handleFilter = (e: string) => {
     //Nhận array result gồm tên các users
-    const result = users.map((item: any) => item.name)
+    const result = users.map((item: { name: string }) => item.name)
 
     //Kiểm tra array result có chứa value input hay không. Nếu có lấy ra tên user.
     const nameResponse = result.filter((item: string) =>
@@ -139,7 +140,7 @@ export default function Users() {
     )
 
     if (nameResponse) {
-      const filterResult = users.filter((user: any) =>
+      const filterResult = users.filter((user: { name: string }) =>
         nameResponse.includes(user.name)
       )
 
