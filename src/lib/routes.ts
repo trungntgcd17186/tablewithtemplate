@@ -21,14 +21,6 @@ export type RouteProps = {
 export let routes = [
   {
     key: uuid(),
-    title: 'Table',
-    Icon: TableOutlined,
-    url: '/quotes',
-    exact: true,
-    Component: Table,
-  },
-  {
-    key: uuid(),
     title: 'Users',
     Icon: UserOutlined,
     url: '',
@@ -62,14 +54,14 @@ export let routes = [
       },
     ],
   },
-  {
-    key: uuid(),
-    title: 'Home',
-    Icon: UserOutlined,
-    url: '/Home',
-    exact: true,
-    Component: Home,
-  },
+  // {
+  //   key: uuid(),
+  //   title: 'Table',
+  //   Icon: TableOutlined,
+  //   url: '/quotes',
+  //   exact: true,
+  //   Component: Table,
+  // },
 ]
 
 export default routes
